@@ -14,7 +14,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Compress, Upload, Download, Image, RefreshCw, ArrowRight } from "lucide-react";
+import { FileMinusIcon, Upload, Download, Image, RefreshCw, ArrowRight } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const ComprimiImmagini = () => {
@@ -351,7 +351,7 @@ const ComprimiImmagini = () => {
                         <Checkbox 
                           id="maintain-ratio" 
                           checked={maintainRatio} 
-                          onCheckedChange={() => setMaintainRatio(!maintainRatio)} 
+                          onCheckedChange={(checked) => setMaintainRatio(checked === true)}
                         />
                         <Label htmlFor="maintain-ratio">
                           Mantieni proporzioni originali
@@ -377,7 +377,7 @@ const ComprimiImmagini = () => {
                   </>
                 ) : (
                   <>
-                    <Compress className="mr-2 h-5 w-5" />
+                    <FileMinusIcon className="mr-2 h-5 w-5" />
                     Comprimi {files.length} immagini
                   </>
                 )}
