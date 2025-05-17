@@ -61,6 +61,7 @@ const PdfToWord = () => {
   const [file, setFile] = useState<File | null>(null);
   const [converting, setConverting] = useState(false);
   const [converted, setConverted] = useState(false);
+  const [convertedData, setConvertedData] = useState<string | null>(null);
   const [outputFormat, setOutputFormat] = useState("docx");
   const [activeTab, setActiveTab] = useState("document");
   const [inputFileType, setInputFileType] = useState("pdf");
@@ -87,6 +88,7 @@ const PdfToWord = () => {
       setInputFileType(fileExt.substring(1));
       setFile(selectedFile);
       setConverted(false);
+      setConvertedData(null);
     }
   };
 
@@ -94,20 +96,100 @@ const PdfToWord = () => {
     if (!file) return;
     
     setConverting(true);
-    // Simulazione della conversione
-    setTimeout(() => {
-      setConverting(false);
-      setConverted(true);
+    
+    // Lettura del file e simulazione della conversione
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      // In una implementazione reale, qui si effettuerebbe la conversione
+      // Per ora simuliamo creando un blob di esempio
       
+      setTimeout(() => {
+        if (!e.target || !e.target.result) {
+          toast({
+            title: "Errore di conversione",
+            description: "Non è stato possibile leggere il file",
+            variant: "destructive",
+          });
+          setConverting(false);
+          return;
+        }
+        
+        // Simula il risultato della conversione
+        // In un'implementazione reale qui ci sarebbe una conversione vera
+        const fileData = e.target.result;
+        
+        // Creiamo un URL per il download del file convertito
+        const blob = new Blob([fileData], { type: getOutputMimeType(outputFormat) });
+        const url = URL.createObjectURL(blob);
+        
+        setConvertedData(url);
+        setConverting(false);
+        setConverted(true);
+        
+        toast({
+          title: "Conversione completata",
+          description: `Il file è stato convertito in formato ${outputFormat}`,
+        });
+      }, 2000);
+    };
+    
+    reader.onerror = () => {
       toast({
-        title: "Conversione completata",
-        description: `Il file è stato convertito in formato ${outputFormat}`,
+        title: "Errore",
+        description: "Si è verificato un errore durante la lettura del file",
+        variant: "destructive",
       });
-    }, 2000);
+      setConverting(false);
+    };
+    
+    // Legge il file come ArrayBuffer (funziona per tutti i tipi di file)
+    reader.readAsArrayBuffer(file);
+  };
+
+  // Determina il MIME type in base all'estensione del file di output
+  const getOutputMimeType = (format: string): string => {
+    const mimeTypes: Record<string, string> = {
+      pdf: "application/pdf",
+      docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      txt: "text/plain",
+      rtf: "application/rtf",
+      odt: "application/vnd.oasis.opendocument.text",
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      png: "image/png",
+      webp: "image/webp",
+      gif: "image/gif",
+      tiff: "image/tiff",
+      bmp: "image/bmp",
+      xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      csv: "text/csv",
+      ods: "application/vnd.oasis.opendocument.spreadsheet",
+      html: "text/html",
+      xml: "application/xml",
+      json: "application/json",
+      yaml: "application/x-yaml",
+      md: "text/markdown"
+    };
+    
+    return mimeTypes[format] || "application/octet-stream";
   };
 
   const handleDownload = () => {
-    // In un'implementazione reale, qui si scaricherebbe il file convertito
+    if (!convertedData || !file) return;
+    
+    // Crea un link per il download e lo attiva
+    const link = document.createElement("a");
+    link.href = convertedData;
+    
+    // Determina il nome del file di output
+    const originalName = file.name.split(".")[0];
+    link.download = `${originalName}.${outputFormat}`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
     toast({
       title: "Download avviato",
       description: `Il file convertito in formato ${outputFormat} verrà scaricato a breve`,
@@ -122,6 +204,7 @@ const PdfToWord = () => {
     setActiveTab(value);
     setFile(null);
     setConverted(false);
+    setConvertedData(null);
     
     // Set default output format for the selected tab
     if (fileTypes[value]?.outputs.length > 0) {
@@ -172,7 +255,11 @@ const PdfToWord = () => {
                     </p>
                     <Button 
                       variant="outline" 
-                      onClick={() => setFile(null)}
+                      onClick={() => {
+                        setFile(null);
+                        setConverted(false);
+                        setConvertedData(null);
+                      }}
                       className="mt-2"
                     >
                       Cambia file
@@ -302,7 +389,45 @@ const PdfToWord = () => {
             </ol>
           </div>
 
-          <div className="ad-placeholder h-80">
+          <div className="bg-white rounded-lg border p-6 mb-6">
+            <h3 className="font-medium mb-4">Formati supportati</h3>
+            <div className="space-y-3">
+              <div>
+                <p className="font-medium text-sm flex items-center">
+                  <FileText className="h-4 w-4 text-blue-500 mr-1" /> Documenti
+                </p>
+                <p className="text-xs text-gray-600 mt-1">
+                  PDF, DOCX, TXT, RTF, ODT
+                </p>
+              </div>
+              <div>
+                <p className="font-medium text-sm flex items-center">
+                  <FileImage className="h-4 w-4 text-green-500 mr-1" /> Immagini
+                </p>
+                <p className="text-xs text-gray-600 mt-1">
+                  JPG, PNG, WEBP, GIF, TIFF, BMP
+                </p>
+              </div>
+              <div>
+                <p className="font-medium text-sm flex items-center">
+                  <FileSpreadsheet className="h-4 w-4 text-orange-500 mr-1" /> Fogli di calcolo
+                </p>
+                <p className="text-xs text-gray-600 mt-1">
+                  XLSX, CSV, ODS
+                </p>
+              </div>
+              <div>
+                <p className="font-medium text-sm flex items-center">
+                  <FileCode className="h-4 w-4 text-purple-500 mr-1" /> Codice
+                </p>
+                <p className="text-xs text-gray-600 mt-1">
+                  HTML, XML, JSON, YAML, MD
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="ad-placeholder h-60">
             Spazio pubblicitario
           </div>
         </div>

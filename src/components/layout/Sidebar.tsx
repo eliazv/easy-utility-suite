@@ -6,7 +6,7 @@ import {
   FileText, Calculator, KeyRound, Image, 
   Percent, AlignLeft, X, Calendar, Clock,
   BarChart2, FileCode, FileSpreadsheet, FileImage,
-  Clock3
+  Clock3, QrCode, Wallet, Compass, Download
 } from "lucide-react";
 
 // Tool groups
@@ -44,6 +44,12 @@ const toolGroups = [
         icon: <Image className="h-5 w-5" />,
         path: "/ridimensiona-immagini",
         color: "text-tool-green"
+      },
+      {
+        name: "Comprimi immagini",
+        icon: <FileImage className="h-5 w-5" />,
+        path: "/comprimi-immagini",
+        color: "text-tool-green"
       }
     ]
   },
@@ -80,6 +86,12 @@ const toolGroups = [
         icon: <Clock className="h-5 w-5" />,
         path: "/converti-ore",
         color: "text-tool-green"
+      },
+      {
+        name: "Convertitore valute",
+        icon: <Wallet className="h-5 w-5" />,
+        path: "/converti-valute",
+        color: "text-tool-purple"
       }
     ]
   },
@@ -92,6 +104,24 @@ const toolGroups = [
         icon: <KeyRound className="h-5 w-5" />,
         path: "/genera-password",
         color: "text-tool-purple"
+      },
+      {
+        name: "Generatore QR Code",
+        icon: <QrCode className="h-5 w-5" />,
+        path: "/genera-qrcode",
+        color: "text-tool-blue"
+      }
+    ]
+  },
+  {
+    id: "utility",
+    name: "Utilità",
+    tools: [
+      {
+        name: "Timer e Cronometro",
+        icon: <Clock3 className="h-5 w-5" />,
+        path: "/timer-cronometro",
+        color: "text-tool-red"
       }
     ]
   }
@@ -104,28 +134,16 @@ const additionalToolGroups = [
     name: "In Arrivo",
     tools: [
       {
-        name: "Convertitore valute",
-        icon: <Calculator className="h-5 w-5" />,
-        path: "/converti-valute",
-        color: "text-tool-purple"
-      },
-      {
-        name: "Generatore QR Code",
-        icon: <FileCode className="h-5 w-5" />,
-        path: "/genera-qrcode",
+        name: "Bussola",
+        icon: <Compass className="h-5 w-5" />,
+        path: "/bussola",
         color: "text-tool-blue"
       },
       {
-        name: "Compressore immagini",
-        icon: <FileImage className="h-5 w-5" />,
-        path: "/comprimi-immagini",
+        name: "Download manager",
+        icon: <Download className="h-5 w-5" />,
+        path: "/download-manager",
         color: "text-tool-green"
-      },
-      {
-        name: "Timer e cronometro",
-        icon: <Clock3 className="h-5 w-5" />,
-        path: "/timer-cronometro",
-        color: "text-tool-red"
       }
     ]
   }

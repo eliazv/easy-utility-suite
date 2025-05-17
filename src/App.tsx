@@ -18,6 +18,10 @@ import LoremIpsum from "./pages/tool-pages/LoremIpsum";
 import ConvertiDate from "./pages/tool-pages/ConvertiDate";
 import ConvertiOre from "./pages/tool-pages/ConvertiOre";
 import CalcolaBMI from "./pages/tool-pages/CalcolaBMI";
+import ConvertiValute from "./pages/tool-pages/ConvertiValute";
+import GeneraQRCode from "./pages/tool-pages/GeneraQRCode";
+import ComprimiImmagini from "./pages/tool-pages/ComprimiImmagini";
+import TimerCronometro from "./pages/tool-pages/TimerCronometro";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +42,7 @@ const App = () => (
             
             {/* Immagini */}
             <Route path="/ridimensiona-immagini" element={<RidimensionaImmagini />} />
+            <Route path="/comprimi-immagini" element={<ComprimiImmagini />} />
             
             {/* Calcolatori */}
             <Route path="/calcola-sconto" element={<CalcolaSconto />} />
@@ -46,9 +51,14 @@ const App = () => (
             {/* Convertitori */}
             <Route path="/converti-date" element={<ConvertiDate />} />
             <Route path="/converti-ore" element={<ConvertiOre />} />
+            <Route path="/converti-valute" element={<ConvertiValute />} />
             
             {/* Sicurezza */}
             <Route path="/genera-password" element={<GeneraPassword />} />
+            <Route path="/genera-qrcode" element={<GeneraQRCode />} />
+            
+            {/* Utilità */}
+            <Route path="/timer-cronometro" element={<TimerCronometro />} />
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

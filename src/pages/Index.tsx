@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import { 
   FileText, Calculator, KeyRound, Image, 
   Percent, AlignLeft, ArrowRight, Calendar,
-  Clock, BarChart2, FileCode, FileSpreadsheet
+  Clock, BarChart2, FileCode, FileSpreadsheet,
+  QrCode, Wallet, Clock3, FileImage, Compass,
+  Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MainLayout from "@/components/layout/MainLayout";
@@ -46,6 +48,13 @@ const toolGroups = [
         icon: <Image className="h-10 w-10" />,
         path: "/ridimensiona-immagini",
         color: "bg-green-50 text-tool-green"
+      },
+      {
+        name: "Comprimi immagini",
+        description: "Riduci la dimensione dei file immagine mantenendo una buona qualità",
+        icon: <FileImage className="h-10 w-10" />,
+        path: "/comprimi-immagini",
+        color: "bg-green-50 text-tool-green"
       }
     ]
   },
@@ -86,12 +95,19 @@ const toolGroups = [
         icon: <Clock className="h-10 w-10" />,
         path: "/converti-ore",
         color: "bg-green-50 text-tool-green"
+      },
+      {
+        name: "Convertitore valute",
+        description: "Converti importi tra diverse valute con tassi di cambio aggiornati",
+        icon: <Wallet className="h-10 w-10" />,
+        path: "/converti-valute",
+        color: "bg-purple-50 text-tool-purple"
       }
     ]
   },
   {
     id: "security",
-    name: "Sicurezza",
+    name: "Sicurezza e Utility",
     tools: [
       {
         name: "Generatore password",
@@ -99,6 +115,20 @@ const toolGroups = [
         icon: <KeyRound className="h-10 w-10" />,
         path: "/genera-password",
         color: "bg-purple-50 text-tool-purple"
+      },
+      {
+        name: "Generatore QR Code",
+        description: "Crea QR code personalizzati per URL, testi, email e numeri di telefono",
+        icon: <QrCode className="h-10 w-10" />,
+        path: "/genera-qrcode",
+        color: "bg-blue-50 text-tool-blue"
+      },
+      {
+        name: "Timer e Cronometro",
+        description: "Strumenti per misurare il tempo con timer countdown e cronometro",
+        icon: <Clock3 className="h-10 w-10" />,
+        path: "/timer-cronometro",
+        color: "bg-red-50 text-tool-red"
       }
     ]
   }
@@ -145,6 +175,45 @@ const Index = () => {
           </div>
         </section>
       ))}
+      
+      <section className="mb-12">
+        <h2 className="text-2xl font-medium mb-6">In Arrivo</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="tool-card opacity-70">
+            <div className="flex items-start">
+              <div className="bg-blue-50 text-tool-blue p-3 rounded-md">
+                <Compass className="h-10 w-10" />
+              </div>
+            </div>
+            <h3 className="text-xl font-medium mt-4">Bussola</h3>
+            <p className="text-gray-500 mt-2 mb-4 flex-grow">
+              Utilizza la bussola per orientarti e trovare il Nord magnetico
+            </p>
+            <div className="flex justify-end mt-2">
+              <Button variant="ghost" className="gap-1" disabled>
+                Presto disponibile
+              </Button>
+            </div>
+          </div>
+
+          <div className="tool-card opacity-70">
+            <div className="flex items-start">
+              <div className="bg-green-50 text-tool-green p-3 rounded-md">
+                <Download className="h-10 w-10" />
+              </div>
+            </div>
+            <h3 className="text-xl font-medium mt-4">Download manager</h3>
+            <p className="text-gray-500 mt-2 mb-4 flex-grow">
+              Gestisci i download di file e archivi da varie fonti
+            </p>
+            <div className="flex justify-end mt-2">
+              <Button variant="ghost" className="gap-1" disabled>
+                Presto disponibile
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
       
       <section className="mt-16">
         <div className="bg-blue-50 rounded-lg p-6 md:p-8">
