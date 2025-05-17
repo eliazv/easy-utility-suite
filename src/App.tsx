@@ -31,18 +31,24 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             
-            {/* Tool routes */}
+            {/* Documenti */}
             <Route path="/pdf-to-word" element={<PdfToWord />} />
             <Route path="/conta-caratteri" element={<ContaCaratteri />} />
-            <Route path="/genera-password" element={<GeneraPassword />} />
-            <Route path="/ridimensiona-immagini" element={<RidimensionaImmagini />} />
-            <Route path="/calcola-sconto" element={<CalcolaSconto />} />
             <Route path="/lorem-ipsum" element={<LoremIpsum />} />
             
-            {/* Nuove funzioni aggiunte */}
+            {/* Immagini */}
+            <Route path="/ridimensiona-immagini" element={<RidimensionaImmagini />} />
+            
+            {/* Calcolatori */}
+            <Route path="/calcola-sconto" element={<CalcolaSconto />} />
+            <Route path="/calcola-bmi" element={<CalcolaBMI />} />
+            
+            {/* Convertitori */}
             <Route path="/converti-date" element={<ConvertiDate />} />
             <Route path="/converti-ore" element={<ConvertiOre />} />
-            <Route path="/calcola-bmi" element={<CalcolaBMI />} />
+            
+            {/* Sicurezza */}
+            <Route path="/genera-password" element={<GeneraPassword />} />
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

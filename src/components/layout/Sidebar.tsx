@@ -4,86 +4,130 @@ import { cn } from "@/lib/utils";
 import { useSidebar } from "@/hooks/use-sidebar";
 import { 
   FileText, Calculator, KeyRound, Image, 
-  Percent, List, BarChart2, AlignLeft, 
-  X, Calendar, Clock
+  Percent, AlignLeft, X, Calendar, Clock,
+  BarChart2, FileCode, FileSpreadsheet, FileImage,
+  Clock3
 } from "lucide-react";
 
-const tools = [
+// Tool groups
+const toolGroups = [
   {
-    name: "Convertitore PDF in Word",
-    icon: <FileText className="h-5 w-5" />,
-    path: "/pdf-to-word",
-    color: "text-tool-red"
+    id: "documents",
+    name: "Documenti",
+    tools: [
+      {
+        name: "Convertitore file",
+        icon: <FileText className="h-5 w-5" />,
+        path: "/pdf-to-word",
+        color: "text-tool-red"
+      },
+      {
+        name: "Conta caratteri e parole",
+        icon: <AlignLeft className="h-5 w-5" />,
+        path: "/conta-caratteri",
+        color: "text-tool-blue"
+      },
+      {
+        name: "Generatore Lorem Ipsum",
+        icon: <AlignLeft className="h-5 w-5" />,
+        path: "/lorem-ipsum",
+        color: "text-tool-purple"
+      }
+    ]
   },
   {
-    name: "Conta caratteri e parole",
-    icon: <AlignLeft className="h-5 w-5" />,
-    path: "/conta-caratteri",
-    color: "text-tool-blue"
+    id: "images",
+    name: "Immagini",
+    tools: [
+      {
+        name: "Ridimensiona immagini",
+        icon: <Image className="h-5 w-5" />,
+        path: "/ridimensiona-immagini",
+        color: "text-tool-green"
+      }
+    ]
   },
   {
-    name: "Generatore password",
-    icon: <KeyRound className="h-5 w-5" />,
-    path: "/genera-password",
-    color: "text-tool-purple"
+    id: "calculators",
+    name: "Calcolatori",
+    tools: [
+      {
+        name: "Calcolatore percentuale",
+        icon: <Percent className="h-5 w-5" />,
+        path: "/calcola-sconto",
+        color: "text-tool-orange"
+      },
+      {
+        name: "Calcolatore BMI",
+        icon: <BarChart2 className="h-5 w-5" />,
+        path: "/calcola-bmi",
+        color: "text-tool-orange"
+      }
+    ]
   },
   {
-    name: "Ridimensiona immagini",
-    icon: <Image className="h-5 w-5" />,
-    path: "/ridimensiona-immagini",
-    color: "text-tool-green"
+    id: "converters",
+    name: "Convertitori",
+    tools: [
+      {
+        name: "Convertitore date",
+        icon: <Calendar className="h-5 w-5" />,
+        path: "/converti-date",
+        color: "text-tool-blue"
+      },
+      {
+        name: "Convertitore ore",
+        icon: <Clock className="h-5 w-5" />,
+        path: "/converti-ore",
+        color: "text-tool-green"
+      }
+    ]
   },
   {
-    name: "Calcolatore sconto",
-    icon: <Percent className="h-5 w-5" />,
-    path: "/calcola-sconto",
-    color: "text-tool-orange"
-  },
-  {
-    name: "Generatore Lorem Ipsum",
-    icon: <AlignLeft className="h-5 w-5" />,
-    path: "/lorem-ipsum",
-    color: "text-tool-purple"
-  },
-  {
-    name: "Convertitore date",
-    icon: <Calendar className="h-5 w-5" />,
-    path: "/converti-date",
-    color: "text-tool-blue"
-  },
-  {
-    name: "Convertitore ore",
-    icon: <Clock className="h-5 w-5" />,
-    path: "/converti-ore",
-    color: "text-tool-green"
-  },
-  {
-    name: "Calcolatore BMI",
-    icon: <BarChart2 className="h-5 w-5" />,
-    path: "/calcola-bmi",
-    color: "text-tool-orange"
+    id: "security",
+    name: "Sicurezza",
+    tools: [
+      {
+        name: "Generatore password",
+        icon: <KeyRound className="h-5 w-5" />,
+        path: "/genera-password",
+        color: "text-tool-purple"
+      }
+    ]
   }
 ];
 
 // Altri strumenti da aggiungere in futuro
-const additionalTools = [
+const additionalToolGroups = [
   {
-    name: "Convertitore valute",
-    icon: <Calculator className="h-5 w-5" />,
-    path: "/converti-valute",
-    color: "text-tool-purple"
-  },
-  {
-    name: "Generatore QR Code",
-    icon: <FileText className="h-5 w-5" />,
-    path: "/genera-qrcode",
-    color: "text-tool-blue"
-  },
-  {
-    name: "Compressore immagini",
-    icon: <Image className="h-5 w-5" />,
-    path: "/comprimi-immagini",
-    color: "text-tool-green"
+    id: "coming-soon",
+    name: "In Arrivo",
+    tools: [
+      {
+        name: "Convertitore valute",
+        icon: <Calculator className="h-5 w-5" />,
+        path: "/converti-valute",
+        color: "text-tool-purple"
+      },
+      {
+        name: "Generatore QR Code",
+        icon: <FileCode className="h-5 w-5" />,
+        path: "/genera-qrcode",
+        color: "text-tool-blue"
+      },
+      {
+        name: "Compressore immagini",
+        icon: <FileImage className="h-5 w-5" />,
+        path: "/comprimi-immagini",
+        color: "text-tool-green"
+      },
+      {
+        name: "Timer e cronometro",
+        icon: <Clock3 className="h-5 w-5" />,
+        path: "/timer-cronometro",
+        color: "text-tool-red"
+      }
+    ]
   }
 ];
 
@@ -114,41 +158,45 @@ const Sidebar = () => {
       
       <div className="flex-1 overflow-auto py-2">
         <nav className="grid gap-1 px-2">
-          <div className="px-3 py-2">
-            <h3 className="mb-2 text-sm font-medium">Strumenti</h3>
-            <ul className="grid gap-1">
-              {tools.map((tool) => (
-                <li key={tool.path}>
-                  <Link
-                    to={tool.path}
-                    className={cn(
-                      "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent",
-                      location.pathname === tool.path ? "bg-accent" : "transparent"
-                    )}
-                  >
-                    <span className={cn("flex-shrink-0", tool.color)}>{tool.icon}</span>
-                    <span>{tool.name}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {toolGroups.map((group) => (
+            <div className="px-3 py-2" key={group.id}>
+              <h3 className="mb-2 text-sm font-medium">{group.name}</h3>
+              <ul className="grid gap-1">
+                {group.tools.map((tool) => (
+                  <li key={tool.path}>
+                    <Link
+                      to={tool.path}
+                      className={cn(
+                        "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent",
+                        location.pathname === tool.path ? "bg-accent" : "transparent"
+                      )}
+                    >
+                      <span className={cn("flex-shrink-0", tool.color)}>{tool.icon}</span>
+                      <span>{tool.name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
           
-          <div className="px-3 py-2">
-            <h3 className="mb-2 text-sm font-medium text-muted-foreground">In Arrivo</h3>
-            <ul className="grid gap-1">
-              {additionalTools.map((tool) => (
-                <li key={tool.path}>
-                  <span
-                    className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground cursor-not-allowed"
-                  >
-                    <span className="flex-shrink-0 opacity-50">{tool.icon}</span>
-                    <span>{tool.name}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {additionalToolGroups.map((group) => (
+            <div className="px-3 py-2" key={group.id}>
+              <h3 className="mb-2 text-sm font-medium text-muted-foreground">{group.name}</h3>
+              <ul className="grid gap-1">
+                {group.tools.map((tool) => (
+                  <li key={tool.path}>
+                    <span
+                      className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground cursor-not-allowed"
+                    >
+                      <span className="flex-shrink-0 opacity-50">{tool.icon}</span>
+                      <span>{tool.name}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </nav>
       </div>
 

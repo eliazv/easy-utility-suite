@@ -2,8 +2,59 @@
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
-import { FileText, Upload, Download } from "lucide-react";
+import { 
+  FileText, Upload, Download, File, FileImage, 
+  FileSpreadsheet, FileCode
+} from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
+interface FileFormat {
+  id: string;
+  name: string;
+  icon: JSX.Element;
+  extensions: string[];
+  outputs: string[];
+}
+
+const fileTypes: Record<string, FileFormat> = {
+  document: {
+    id: "document",
+    name: "Documento",
+    icon: <FileText className="h-8 w-8 text-blue-500" />,
+    extensions: [".pdf", ".docx", ".txt", ".rtf", ".odt"],
+    outputs: ["docx", "pdf", "txt", "rtf", "odt"]
+  },
+  image: {
+    id: "image",
+    name: "Immagine",
+    icon: <FileImage className="h-8 w-8 text-green-500" />,
+    extensions: [".jpg", ".jpeg", ".png", ".webp", ".gif", ".tiff", ".bmp"],
+    outputs: ["jpg", "png", "webp", "gif", "tiff", "bmp"]
+  },
+  spreadsheet: {
+    id: "spreadsheet",
+    name: "Foglio di calcolo",
+    icon: <FileSpreadsheet className="h-8 w-8 text-orange-500" />,
+    extensions: [".xls", ".xlsx", ".csv", ".ods"],
+    outputs: ["xlsx", "csv", "ods"]
+  },
+  code: {
+    id: "code",
+    name: "Codice",
+    icon: <FileCode className="h-8 w-8 text-purple-500" />,
+    extensions: [".html", ".xml", ".json", ".yaml", ".md"],
+    outputs: ["html", "xml", "json", "yaml", "md"]
+  }
+};
 
 const PdfToWord = () => {
   const { toast } = useToast();
@@ -11,21 +62,29 @@ const PdfToWord = () => {
   const [converting, setConverting] = useState(false);
   const [converted, setConverted] = useState(false);
   const [outputFormat, setOutputFormat] = useState("docx");
+  const [activeTab, setActiveTab] = useState("document");
+  const [inputFileType, setInputFileType] = useState("pdf");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
       
-      // Verifica che il file sia un PDF
-      if (selectedFile.type !== 'application/pdf') {
+      // Get file extension
+      const fileExt = "." + selectedFile.name.split('.').pop()?.toLowerCase();
+      
+      // Check if file extension is valid for the selected tab
+      const validExtensions = fileTypes[activeTab].extensions;
+      if (!validExtensions.includes(fileExt)) {
         toast({
-          title: "Errore",
-          description: "Seleziona un file PDF valido",
+          title: "Formato non valido",
+          description: `Seleziona un file con uno dei seguenti formati: ${validExtensions.join(', ')}`,
           variant: "destructive",
         });
         return;
       }
       
+      // Set input file type without the dot
+      setInputFileType(fileExt.substring(1));
       setFile(selectedFile);
       setConverted(false);
     }
@@ -42,7 +101,7 @@ const PdfToWord = () => {
       
       toast({
         title: "Conversione completata",
-        description: `Il PDF è stato convertito in formato ${getFormatName(outputFormat)}`,
+        description: `Il file è stato convertito in formato ${outputFormat}`,
       });
     }, 2000);
   };
@@ -51,40 +110,62 @@ const PdfToWord = () => {
     // In un'implementazione reale, qui si scaricherebbe il file convertito
     toast({
       title: "Download avviato",
-      description: `Il file convertito in formato ${getFormatName(outputFormat)} verrà scaricato a breve`,
+      description: `Il file convertito in formato ${outputFormat} verrà scaricato a breve`,
     });
   };
   
-  const getFormatName = (format: string) => {
-    const formats: {[key: string]: string} = {
-      "docx": "Word (.docx)",
-      "txt": "Testo (.txt)",
-      "html": "HTML (.html)",
-      "rtf": "Rich Text (.rtf)"
-    };
+  const getAcceptedFileTypes = () => {
+    return fileTypes[activeTab].extensions.join(',');
+  };
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setFile(null);
+    setConverted(false);
     
-    return formats[format] || format;
+    // Set default output format for the selected tab
+    if (fileTypes[value]?.outputs.length > 0) {
+      setOutputFormat(fileTypes[value].outputs[0]);
+    }
+  };
+  
+  const getFileIcon = (fileType: string) => {
+    if (fileType.includes("pdf")) return <FileText className="h-10 w-10 text-red-500" />;
+    if (fileType.includes("doc")) return <FileText className="h-10 w-10 text-blue-500" />;
+    if (fileType.includes("jpg") || fileType.includes("png")) return <FileImage className="h-10 w-10 text-green-500" />;
+    if (fileType.includes("xls") || fileType.includes("csv")) return <FileSpreadsheet className="h-10 w-10 text-orange-500" />;
+    if (fileType.includes("html") || fileType.includes("json")) return <FileCode className="h-10 w-10 text-purple-500" />;
+    return <File className="h-10 w-10 text-gray-500" />;
   };
 
   return (
     <MainLayout>
       <div className="tool-header">
-        <h1>Convertitore da PDF a Word e altri formati</h1>
+        <h1>Convertitore di file</h1>
         <p className="text-gray-600 mt-2">
-          Converti facilmente i tuoi documenti PDF in file Word (.docx) e altri formati modificabili.
-          Mantieni la formattazione e il layout originale.
+          Converti i tuoi file tra diversi formati mantenendo la qualità originale.
+          Supporta documenti, immagini, fogli di calcolo e altro.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg border p-6">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-6">
+              <TabsList className="grid grid-cols-4 mb-4">
+                <TabsTrigger value="document">Documenti</TabsTrigger>
+                <TabsTrigger value="image">Immagini</TabsTrigger>
+                <TabsTrigger value="spreadsheet">Fogli di calcolo</TabsTrigger>
+                <TabsTrigger value="code">Codice</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            
             <div className="mb-6">
-              <h2 className="text-xl font-medium mb-2">1. Carica il tuo file PDF</h2>
+              <h2 className="text-xl font-medium mb-2">1. Carica il tuo file</h2>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                 {file ? (
                   <div className="flex flex-col items-center gap-2">
-                    <FileText className="h-10 w-10 text-blue-500" />
+                    {getFileIcon(file.name.toLowerCase())}
                     <p className="font-medium">{file.name}</p>
                     <p className="text-sm text-gray-500">
                       {(file.size / 1024 / 1024).toFixed(2)} MB
@@ -101,23 +182,23 @@ const PdfToWord = () => {
                   <div>
                     <Upload className="mx-auto h-12 w-12 text-gray-400 mb-2" />
                     <p className="text-gray-600 mb-2">
-                      Trascina qui il tuo file PDF o
+                      Trascina qui il tuo file o
                     </p>
                     <Button
                       variant="outline"
-                      onClick={() => document.getElementById("pdf-upload")?.click()}
+                      onClick={() => document.getElementById("file-upload")?.click()}
                     >
                       Seleziona file
                     </Button>
                     <input
-                      id="pdf-upload"
+                      id="file-upload"
                       type="file"
-                      accept=".pdf"
+                      accept={getAcceptedFileTypes()}
                       className="hidden"
                       onChange={handleFileChange}
                     />
                     <p className="mt-2 text-sm text-gray-500">
-                      Massimo 10MB per file
+                      Formati supportati: {fileTypes[activeTab].extensions.join(', ')} (max 10MB)
                     </p>
                   </div>
                 )}
@@ -127,86 +208,26 @@ const PdfToWord = () => {
             {file && (
               <div className="mb-6">
                 <h2 className="text-xl font-medium mb-2">2. Scegli il formato di output</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="relative">
-                    <input
-                      type="radio"
-                      id="format-docx"
-                      name="format"
-                      className="peer absolute opacity-0"
-                      value="docx"
-                      checked={outputFormat === "docx"}
-                      onChange={(e) => setOutputFormat(e.target.value)}
-                    />
-                    <label
-                      htmlFor="format-docx"
-                      className="flex flex-col items-center justify-center p-4 border rounded-lg text-center cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5"
-                    >
-                      <FileText className="h-8 w-8 mb-2 text-blue-500" />
-                      <span className="font-medium">Word</span>
-                      <span className="text-xs text-gray-500">(.docx)</span>
-                    </label>
-                  </div>
-                  
-                  <div className="relative">
-                    <input
-                      type="radio"
-                      id="format-txt"
-                      name="format"
-                      className="peer absolute opacity-0"
-                      value="txt"
-                      checked={outputFormat === "txt"}
-                      onChange={(e) => setOutputFormat(e.target.value)}
-                    />
-                    <label
-                      htmlFor="format-txt"
-                      className="flex flex-col items-center justify-center p-4 border rounded-lg text-center cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5"
-                    >
-                      <FileText className="h-8 w-8 mb-2 text-green-500" />
-                      <span className="font-medium">Testo</span>
-                      <span className="text-xs text-gray-500">(.txt)</span>
-                    </label>
-                  </div>
-                  
-                  <div className="relative">
-                    <input
-                      type="radio"
-                      id="format-html"
-                      name="format"
-                      className="peer absolute opacity-0"
-                      value="html"
-                      checked={outputFormat === "html"}
-                      onChange={(e) => setOutputFormat(e.target.value)}
-                    />
-                    <label
-                      htmlFor="format-html"
-                      className="flex flex-col items-center justify-center p-4 border rounded-lg text-center cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5"
-                    >
-                      <FileText className="h-8 w-8 mb-2 text-orange-500" />
-                      <span className="font-medium">HTML</span>
-                      <span className="text-xs text-gray-500">(.html)</span>
-                    </label>
-                  </div>
-                  
-                  <div className="relative">
-                    <input
-                      type="radio"
-                      id="format-rtf"
-                      name="format"
-                      className="peer absolute opacity-0"
-                      value="rtf"
-                      checked={outputFormat === "rtf"}
-                      onChange={(e) => setOutputFormat(e.target.value)}
-                    />
-                    <label
-                      htmlFor="format-rtf"
-                      className="flex flex-col items-center justify-center p-4 border rounded-lg text-center cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5"
-                    >
-                      <FileText className="h-8 w-8 mb-2 text-purple-500" />
-                      <span className="font-medium">Rich Text</span>
-                      <span className="text-xs text-gray-500">(.rtf)</span>
-                    </label>
-                  </div>
+                <div className="max-w-xs">
+                  <Label htmlFor="output-format">Formato di output</Label>
+                  <Select 
+                    value={outputFormat} 
+                    onValueChange={setOutputFormat}
+                  >
+                    <SelectTrigger id="output-format" className="mt-1">
+                      <SelectValue placeholder="Seleziona formato" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fileTypes[activeTab].outputs
+                        .filter(format => format !== inputFileType) // Exclude current format
+                        .map(format => (
+                          <SelectItem key={format} value={format}>
+                            {format.toUpperCase()}
+                          </SelectItem>
+                        ))
+                      }
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             )}
@@ -224,7 +245,7 @@ const PdfToWord = () => {
                     Conversione in corso...
                   </>
                 ) : (
-                  `Converti in ${getFormatName(outputFormat)}`
+                  `Converti in ${outputFormat.toUpperCase()}`
                 )}
               </Button>
             </div>
@@ -237,7 +258,7 @@ const PdfToWord = () => {
                   className="w-full flex items-center justify-center gap-2 py-6"
                 >
                   <Download className="h-5 w-5" />
-                  Scarica documento {getFormatName(outputFormat)}
+                  Scarica file {outputFormat.toUpperCase()}
                 </Button>
               </div>
             )}
@@ -252,25 +273,31 @@ const PdfToWord = () => {
                 <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium">
                   1
                 </div>
-                <span>Carica il tuo file PDF (max 10MB)</span>
+                <span>Seleziona il tipo di file che vuoi convertire</span>
               </li>
               <li className="flex gap-2">
                 <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium">
                   2
                 </div>
-                <span>Scegli il formato di output desiderato</span>
+                <span>Carica il tuo file (max 10MB)</span>
               </li>
               <li className="flex gap-2">
                 <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium">
                   3
                 </div>
-                <span>Clicca sul pulsante "Converti"</span>
+                <span>Scegli il formato di output desiderato</span>
               </li>
               <li className="flex gap-2">
                 <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium">
                   4
                 </div>
-                <span>Scarica il documento convertito</span>
+                <span>Clicca sul pulsante "Converti"</span>
+              </li>
+              <li className="flex gap-2">
+                <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium">
+                  5
+                </div>
+                <span>Scarica il file convertito</span>
               </li>
             </ol>
           </div>
