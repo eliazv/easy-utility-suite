@@ -96,8 +96,8 @@ const toolGroups = [
     ]
   },
   {
-    id: "security",
-    name: "Sicurezza",
+    id: "generators",
+    name: "Generatori",
     tools: [
       {
         name: "Generatore password",
@@ -110,6 +110,12 @@ const toolGroups = [
         icon: <QrCode className="h-5 w-5" />,
         path: "/genera-qrcode",
         color: "text-tool-blue"
+      },
+      {
+        name: "Generatore Lorem Ipsum",
+        icon: <AlignLeft className="h-5 w-5" />,
+        path: "/lorem-ipsum",
+        color: "text-tool-red"
       }
     ]
   },

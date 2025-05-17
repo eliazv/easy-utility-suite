@@ -28,13 +28,6 @@ const toolGroups = [
         icon: <AlignLeft className="h-10 w-10" />,
         path: "/conta-caratteri",
         color: "bg-blue-50 text-tool-blue"
-      },
-      {
-        name: "Generatore Lorem Ipsum",
-        description: "Genera testo fittizio per i tuoi progetti di design",
-        icon: <AlignLeft className="h-10 w-10" />,
-        path: "/lorem-ipsum",
-        color: "bg-purple-50 text-tool-purple"
       }
     ]
   },
@@ -106,8 +99,8 @@ const toolGroups = [
     ]
   },
   {
-    id: "security",
-    name: "Sicurezza e Utility",
+    id: "generators",
+    name: "Generatori",
     tools: [
       {
         name: "Generatore password",
@@ -123,6 +116,19 @@ const toolGroups = [
         path: "/genera-qrcode",
         color: "bg-blue-50 text-tool-blue"
       },
+      {
+        name: "Generatore Lorem Ipsum",
+        description: "Genera testo fittizio per i tuoi progetti di design",
+        icon: <AlignLeft className="h-10 w-10" />,
+        path: "/lorem-ipsum",
+        color: "bg-red-50 text-tool-red"
+      }
+    ]
+  },
+  {
+    id: "utility",
+    name: "Utilità",
+    tools: [
       {
         name: "Timer e Cronometro",
         description: "Strumenti per misurare il tempo con timer countdown e cronometro",

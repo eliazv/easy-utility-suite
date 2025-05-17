@@ -90,7 +90,12 @@ const ComprimiImmagini = () => {
           canvas.height = finalHeight;
           
           const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, finalWidth, finalHeight);
+          if (!ctx) {
+            reject(new Error('Impossibile creare il contesto canvas'));
+            return;
+          }
+          
+          ctx.drawImage(img, 0, 0, finalWidth, finalHeight);
           
           // Determina il formato di output
           let outputFormat = file.type;
@@ -378,7 +383,7 @@ const ComprimiImmagini = () => {
                 ) : (
                   <>
                     <FileMinusIcon className="mr-2 h-5 w-5" />
-                    Comprimi {files.length} immagini
+                    Comprimi {files.length > 0 ? files.length : ""} immagini
                   </>
                 )}
               </Button>
