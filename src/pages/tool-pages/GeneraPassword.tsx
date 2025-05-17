@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -20,11 +20,6 @@ const GeneraPassword = () => {
     symbols: true,
   });
   const [copied, setCopied] = useState(false);
-
-  // Genera una password all'avvio
-  useState(() => {
-    generatePassword();
-  });
 
   const generatePassword = () => {
     let charset = "";
@@ -48,6 +43,11 @@ const GeneraPassword = () => {
     setPassword(result);
     setCopied(false);
   };
+  
+  // Genera una password all'avvio
+  useEffect(() => {
+    generatePassword();
+  }, []);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(password);
