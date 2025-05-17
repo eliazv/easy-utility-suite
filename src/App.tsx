@@ -15,6 +15,9 @@ import GeneraPassword from "./pages/tool-pages/GeneraPassword";
 import RidimensionaImmagini from "./pages/tool-pages/RidimensionaImmagini";
 import CalcolaSconto from "./pages/tool-pages/CalcolaSconto";
 import LoremIpsum from "./pages/tool-pages/LoremIpsum";
+import ConvertiDate from "./pages/tool-pages/ConvertiDate";
+import ConvertiOre from "./pages/tool-pages/ConvertiOre";
+import CalcolaBMI from "./pages/tool-pages/CalcolaBMI";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +38,11 @@ const App = () => (
             <Route path="/ridimensiona-immagini" element={<RidimensionaImmagini />} />
             <Route path="/calcola-sconto" element={<CalcolaSconto />} />
             <Route path="/lorem-ipsum" element={<LoremIpsum />} />
+            
+            {/* Nuove funzioni aggiunte */}
+            <Route path="/converti-date" element={<ConvertiDate />} />
+            <Route path="/converti-ore" element={<ConvertiOre />} />
+            <Route path="/calcola-bmi" element={<CalcolaBMI />} />
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

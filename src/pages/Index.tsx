@@ -2,7 +2,8 @@
 import { Link } from "react-router-dom";
 import { 
   FileText, Calculator, KeyRound, Image, 
-  Percent, AlignLeft, ArrowRight 
+  Percent, AlignLeft, ArrowRight, Calendar,
+  Clock, BarChart2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MainLayout from "@/components/layout/MainLayout";
@@ -49,6 +50,27 @@ const tools = [
     icon: <AlignLeft className="h-10 w-10" />,
     path: "/lorem-ipsum",
     color: "bg-purple-50 text-tool-purple"
+  },
+  {
+    name: "Convertitore date",
+    description: "Converti date tra diversi formati internazionali",
+    icon: <Calendar className="h-10 w-10" />,
+    path: "/converti-date",
+    color: "bg-blue-50 text-tool-blue"
+  },
+  {
+    name: "Convertitore ore",
+    description: "Converti orari tra formato 12h, 24h, minuti e secondi",
+    icon: <Clock className="h-10 w-10" />,
+    path: "/converti-ore",
+    color: "bg-green-50 text-tool-green"
+  },
+  {
+    name: "Calcolatore BMI",
+    description: "Calcola il tuo Indice di Massa Corporea e scopri se sei nel range ideale",
+    icon: <BarChart2 className="h-10 w-10" />,
+    path: "/calcola-bmi",
+    color: "bg-orange-50 text-tool-orange"
   }
 ];
 

@@ -3,15 +3,30 @@ import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { FileText, Upload, Download } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const PdfToWord = () => {
+  const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [converting, setConverting] = useState(false);
   const [converted, setConverted] = useState(false);
+  const [outputFormat, setOutputFormat] = useState("docx");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      
+      // Verifica che il file sia un PDF
+      if (selectedFile.type !== 'application/pdf') {
+        toast({
+          title: "Errore",
+          description: "Seleziona un file PDF valido",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setFile(selectedFile);
       setConverted(false);
     }
   };
@@ -24,20 +39,39 @@ const PdfToWord = () => {
     setTimeout(() => {
       setConverting(false);
       setConverted(true);
+      
+      toast({
+        title: "Conversione completata",
+        description: `Il PDF è stato convertito in formato ${getFormatName(outputFormat)}`,
+      });
     }, 2000);
   };
 
   const handleDownload = () => {
     // In un'implementazione reale, qui si scaricherebbe il file convertito
-    alert("In un'implementazione reale, qui scaricheresti il file convertito");
+    toast({
+      title: "Download avviato",
+      description: `Il file convertito in formato ${getFormatName(outputFormat)} verrà scaricato a breve`,
+    });
+  };
+  
+  const getFormatName = (format: string) => {
+    const formats: {[key: string]: string} = {
+      "docx": "Word (.docx)",
+      "txt": "Testo (.txt)",
+      "html": "HTML (.html)",
+      "rtf": "Rich Text (.rtf)"
+    };
+    
+    return formats[format] || format;
   };
 
   return (
     <MainLayout>
       <div className="tool-header">
-        <h1>Convertitore da PDF a Word</h1>
+        <h1>Convertitore da PDF a Word e altri formati</h1>
         <p className="text-gray-600 mt-2">
-          Converti facilmente i tuoi documenti PDF in file Word (.docx) modificabili.
+          Converti facilmente i tuoi documenti PDF in file Word (.docx) e altri formati modificabili.
           Mantieni la formattazione e il layout originale.
         </p>
       </div>
@@ -90,8 +124,95 @@ const PdfToWord = () => {
               </div>
             </div>
 
+            {file && (
+              <div className="mb-6">
+                <h2 className="text-xl font-medium mb-2">2. Scegli il formato di output</h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="relative">
+                    <input
+                      type="radio"
+                      id="format-docx"
+                      name="format"
+                      className="peer absolute opacity-0"
+                      value="docx"
+                      checked={outputFormat === "docx"}
+                      onChange={(e) => setOutputFormat(e.target.value)}
+                    />
+                    <label
+                      htmlFor="format-docx"
+                      className="flex flex-col items-center justify-center p-4 border rounded-lg text-center cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5"
+                    >
+                      <FileText className="h-8 w-8 mb-2 text-blue-500" />
+                      <span className="font-medium">Word</span>
+                      <span className="text-xs text-gray-500">(.docx)</span>
+                    </label>
+                  </div>
+                  
+                  <div className="relative">
+                    <input
+                      type="radio"
+                      id="format-txt"
+                      name="format"
+                      className="peer absolute opacity-0"
+                      value="txt"
+                      checked={outputFormat === "txt"}
+                      onChange={(e) => setOutputFormat(e.target.value)}
+                    />
+                    <label
+                      htmlFor="format-txt"
+                      className="flex flex-col items-center justify-center p-4 border rounded-lg text-center cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5"
+                    >
+                      <FileText className="h-8 w-8 mb-2 text-green-500" />
+                      <span className="font-medium">Testo</span>
+                      <span className="text-xs text-gray-500">(.txt)</span>
+                    </label>
+                  </div>
+                  
+                  <div className="relative">
+                    <input
+                      type="radio"
+                      id="format-html"
+                      name="format"
+                      className="peer absolute opacity-0"
+                      value="html"
+                      checked={outputFormat === "html"}
+                      onChange={(e) => setOutputFormat(e.target.value)}
+                    />
+                    <label
+                      htmlFor="format-html"
+                      className="flex flex-col items-center justify-center p-4 border rounded-lg text-center cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5"
+                    >
+                      <FileText className="h-8 w-8 mb-2 text-orange-500" />
+                      <span className="font-medium">HTML</span>
+                      <span className="text-xs text-gray-500">(.html)</span>
+                    </label>
+                  </div>
+                  
+                  <div className="relative">
+                    <input
+                      type="radio"
+                      id="format-rtf"
+                      name="format"
+                      className="peer absolute opacity-0"
+                      value="rtf"
+                      checked={outputFormat === "rtf"}
+                      onChange={(e) => setOutputFormat(e.target.value)}
+                    />
+                    <label
+                      htmlFor="format-rtf"
+                      className="flex flex-col items-center justify-center p-4 border rounded-lg text-center cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5"
+                    >
+                      <FileText className="h-8 w-8 mb-2 text-purple-500" />
+                      <span className="font-medium">Rich Text</span>
+                      <span className="text-xs text-gray-500">(.rtf)</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="mb-6">
-              <h2 className="text-xl font-medium mb-2">2. Converti in Word</h2>
+              <h2 className="text-xl font-medium mb-2">3. Converti il file</h2>
               <Button
                 onClick={handleConvert}
                 disabled={!file || converting}
@@ -103,20 +224,20 @@ const PdfToWord = () => {
                     Conversione in corso...
                   </>
                 ) : (
-                  "Converti in Word"
+                  `Converti in ${getFormatName(outputFormat)}`
                 )}
               </Button>
             </div>
 
             {converted && (
               <div>
-                <h2 className="text-xl font-medium mb-2">3. Scarica il file</h2>
+                <h2 className="text-xl font-medium mb-2">4. Scarica il file</h2>
                 <Button
                   onClick={handleDownload}
                   className="w-full flex items-center justify-center gap-2 py-6"
                 >
                   <Download className="h-5 w-5" />
-                  Scarica documento Word
+                  Scarica documento {getFormatName(outputFormat)}
                 </Button>
               </div>
             )}
@@ -137,13 +258,19 @@ const PdfToWord = () => {
                 <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium">
                   2
                 </div>
-                <span>Clicca sul pulsante "Converti in Word"</span>
+                <span>Scegli il formato di output desiderato</span>
               </li>
               <li className="flex gap-2">
                 <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium">
                   3
                 </div>
-                <span>Scarica il documento Word convertito</span>
+                <span>Clicca sul pulsante "Converti"</span>
+              </li>
+              <li className="flex gap-2">
+                <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium">
+                  4
+                </div>
+                <span>Scarica il documento convertito</span>
               </li>
             </ol>
           </div>

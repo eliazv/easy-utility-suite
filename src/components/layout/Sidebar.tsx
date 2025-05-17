@@ -44,11 +44,7 @@ const tools = [
     icon: <AlignLeft className="h-5 w-5" />,
     path: "/lorem-ipsum",
     color: "text-tool-purple"
-  }
-];
-
-// Altri strumenti da aggiungere in futuro
-const additionalTools = [
+  },
   {
     name: "Convertitore date",
     icon: <Calendar className="h-5 w-5" />,
@@ -66,6 +62,28 @@ const additionalTools = [
     icon: <BarChart2 className="h-5 w-5" />,
     path: "/calcola-bmi",
     color: "text-tool-orange"
+  }
+];
+
+// Altri strumenti da aggiungere in futuro
+const additionalTools = [
+  {
+    name: "Convertitore valute",
+    icon: <Calculator className="h-5 w-5" />,
+    path: "/converti-valute",
+    color: "text-tool-purple"
+  },
+  {
+    name: "Generatore QR Code",
+    icon: <FileText className="h-5 w-5" />,
+    path: "/genera-qrcode",
+    color: "text-tool-blue"
+  },
+  {
+    name: "Compressore immagini",
+    icon: <Image className="h-5 w-5" />,
+    path: "/comprimi-immagini",
+    color: "text-tool-green"
   }
 ];
 
