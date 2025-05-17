@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Upload, Download, Image, Trash } from "lucide-react";
+import { Upload, Download, Image as ImageIcon, Trash } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const RidimensionaImmagini = () => {
@@ -44,7 +44,7 @@ const RidimensionaImmagini = () => {
           setPreview(e.target.result as string);
           
           // Carica l'immagine per ottenere le dimensioni originali
-          const img = new Image();
+          const img = new window.Image();
           img.src = e.target.result as string;
           img.onload = () => {
             setDimensions({ width: img.width, height: img.height });
@@ -89,7 +89,7 @@ const RidimensionaImmagini = () => {
     if (!ctx) return;
     
     // Crea un'immagine con l'anteprima
-    const img = new Image();
+    const img = new window.Image();
     img.src = preview;
     
     img.onload = () => {
@@ -302,25 +302,25 @@ const RidimensionaImmagini = () => {
             <ul className="space-y-3 text-sm text-gray-700">
               <li className="flex gap-2">
                 <div className="bg-blue-100 p-1 rounded-full text-blue-700">
-                  <Image className="h-3 w-3" />
+                  <ImageIcon className="h-3 w-3" />
                 </div>
                 <span>Mantieni le proporzioni dell'immagine</span>
               </li>
               <li className="flex gap-2">
                 <div className="bg-blue-100 p-1 rounded-full text-blue-700">
-                  <Image className="h-3 w-3" />
+                  <ImageIcon className="h-3 w-3" />
                 </div>
                 <span>Regola la qualità dell'immagine</span>
               </li>
               <li className="flex gap-2">
                 <div className="bg-blue-100 p-1 rounded-full text-blue-700">
-                  <Image className="h-3 w-3" />
+                  <ImageIcon className="h-3 w-3" />
                 </div>
                 <span>Supporto per JPEG, PNG e WebP</span>
               </li>
               <li className="flex gap-2">
                 <div className="bg-blue-100 p-1 rounded-full text-blue-700">
-                  <Image className="h-3 w-3" />
+                  <ImageIcon className="h-3 w-3" />
                 </div>
                 <span>Anteprima in tempo reale</span>
               </li>
