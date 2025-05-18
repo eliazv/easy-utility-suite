@@ -170,3 +170,29 @@
   overflow-x: hidden;
   max-width: 100vw;
 }
+
+/* Stile per lo sfondo scuro quando la sidebar mobile è aperta */
+.sidebar-overlay {
+  @apply fixed inset-0 bg-black/60 z-20 transition-opacity;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Assicura che gli elementi non siano cliccabili attraverso l'overlay */
+.no-pointer-events {
+  pointer-events: none;
+}
+
+/* Fissa il problema della sovrapposizione del testo in sidebar */
+.truncate-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}

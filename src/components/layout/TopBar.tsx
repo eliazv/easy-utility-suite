@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/hooks/use-sidebar";
 
 const TopBar = () => {
-  const { isOpen, toggle } = useSidebar();
+  const { toggle, open } = useSidebar();
 
   return (
     <div className="sticky top-0 z-10 border-b bg-background px-4 h-16 flex items-center justify-between">
@@ -12,7 +12,7 @@ const TopBar = () => {
         <Button 
           variant="ghost" 
           size="icon" 
-          onClick={toggle} 
+          onClick={() => open()} 
           className="md:hidden"
         >
           <Menu className="h-5 w-5" />
@@ -30,7 +30,7 @@ const TopBar = () => {
 
       <div className="flex items-center gap-2">
         <Button variant="outline" size="sm">
-          Contattaci
+          Feedback
         </Button>
       </div>
     </div>

@@ -5,7 +5,9 @@ import {
   Percent, AlignLeft, ArrowRight, Calendar,
   Clock, BarChart2, FileImage,
   Clock3, QrCode, Wallet, Compass,
-  Download, Palette, Ruler
+  Download, Palette, Ruler, Crosshair, 
+  MapPin, MessageSquare, Wifi, PenTool,
+  SplitSquareVertical
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MainLayout from "@/components/layout/MainLayout";
@@ -75,6 +77,13 @@ const toolGroups = [
         description: "Converti facilmente tra diverse unità di misura",
         icon: <Ruler className="h-10 w-10" />,
         path: "/converti-unita",
+        color: "bg-orange-50 text-tool-orange"
+      },
+      {
+        name: "Calcolatore area",
+        description: "Calcola l'area di diverse figure geometriche",
+        icon: <SplitSquareVertical className="h-10 w-10" />,
+        path: "/calcola-area",
         color: "bg-orange-50 text-tool-orange"
       }
     ]
@@ -150,6 +159,47 @@ const toolGroups = [
         icon: <Clock3 className="h-10 w-10" />,
         path: "/timer-cronometro",
         color: "bg-red-50 text-tool-red"
+      },
+      {
+        name: "Condivisione wifi",
+        description: "Genera QR code per condividere facilmente la rete wifi",
+        icon: <Wifi className="h-10 w-10" />,
+        path: "/condividi-wifi",
+        color: "bg-blue-50 text-tool-blue"
+      },
+      {
+        name: "Strumento disegno",
+        description: "Canvas digitale per disegno a mano libera e sketch",
+        icon: <PenTool className="h-10 w-10" />,
+        path: "/strumento-disegno",
+        color: "bg-purple-50 text-tool-purple"
+      }
+    ]
+  },
+  {
+    id: "geografici",
+    name: "Strumenti Geografici",
+    tools: [
+      {
+        name: "Bussola",
+        description: "Utilizza la bussola per orientarti e trovare il Nord magnetico",
+        icon: <Compass className="h-10 w-10" />,
+        path: "/bussola",
+        color: "bg-blue-50 text-tool-blue"
+      },
+      {
+        name: "Coordinate GPS",
+        description: "Rileva e condividi la tua posizione GPS attuale",
+        icon: <MapPin className="h-10 w-10" />,
+        path: "/coordinate-gps",
+        color: "bg-red-50 text-tool-red"
+      },
+      {
+        name: "Calcolo distanza",
+        description: "Misura la distanza tra due punti sulla mappa",
+        icon: <Crosshair className="h-10 w-10" />,
+        path: "/calcolo-distanza",
+        color: "bg-green-50 text-tool-green"
       }
     ]
   }
@@ -203,12 +253,12 @@ const Index = () => {
           <div className="tool-card opacity-70">
             <div className="flex items-start">
               <div className="bg-blue-50 text-tool-blue p-3 rounded-md">
-                <Compass className="h-10 w-10" />
+                <MessageSquare className="h-10 w-10" />
               </div>
             </div>
-            <h3 className="text-xl font-medium mt-4">Bussola</h3>
+            <h3 className="text-xl font-medium mt-4">Traduttore testo</h3>
             <p className="text-gray-500 mt-2 mb-4 flex-grow">
-              Utilizza la bussola per orientarti e trovare il Nord magnetico
+              Traduci testi tra diverse lingue con traduzione automatica
             </p>
             <div className="flex justify-end mt-2">
               <Button variant="ghost" className="gap-1" disabled>

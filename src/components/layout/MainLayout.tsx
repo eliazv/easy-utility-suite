@@ -11,7 +11,7 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   const location = useLocation();
-  const { close } = useSidebar();
+  const { close, isOpen } = useSidebar();
   
   // Chiudi la sidebar quando cambia la rotta in modalità mobile
   useEffect(() => {
@@ -20,6 +20,20 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       close();
     }
   }, [location.pathname, close]);
+
+  // Impedisci lo scrolling del body quando la sidebar mobile è aperta
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    if (isMobile && isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   return (
     <div className="flex min-h-screen bg-gray-50/50">
