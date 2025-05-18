@@ -4,8 +4,10 @@ import MainLayout from "@/components/layout/MainLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Calculator, ArrowRight, Percent } from "lucide-react";
+import { Calculator, ArrowRight, Percent, Share2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/components/ui/sonner";
 
 const CalcolaSconto = () => {
   // State for discount tab
@@ -23,7 +25,33 @@ const CalcolaSconto = () => {
   const [tipoCalcolo, setTipoCalcolo] = useState<string>("originale-percentuale");
   const [risultatoPercentuale, setRisultatoPercentuale] = useState<number | null>(null);
   
+  // Quick percentage calculation
+  const [baseValue, setBaseValue] = useState<string>("");
+  const [percentValue, setPercentValue] = useState<string>("");
+  const [quickResult, setQuickResult] = useState<number | null>(null);
+  
+  // Currency format settings
+  const [valuta, setValuta] = useState<string>("EUR");
+  const [simboloValuta, setSimboloValuta] = useState<string>("€");
+  
   const [error, setError] = useState("");
+
+  // Initialize currency symbol based on selected currency
+  useEffect(() => {
+    switch(valuta) {
+      case "USD":
+        setSimboloValuta("$");
+        break;
+      case "GBP":
+        setSimboloValuta("£");
+        break;
+      case "JPY":
+        setSimboloValuta("¥");
+        break;
+      default:
+        setSimboloValuta("€");
+    }
+  }, [valuta]);
 
   // Calcola i risultati quando cambiano i valori per lo sconto
   useEffect(() => {
@@ -38,6 +66,20 @@ const CalcolaSconto = () => {
       calcolaPercentuale();
     }
   }, [valore1, valore2, tipoCalcolo]);
+  
+  // Calcola la percentuale rapida
+  useEffect(() => {
+    if (baseValue && percentValue) {
+      const base = parseFloat(baseValue);
+      const percent = parseFloat(percentValue);
+      
+      if (!isNaN(base) && !isNaN(percent)) {
+        setQuickResult(base * (percent / 100));
+      }
+    } else {
+      setQuickResult(null);
+    }
+  }, [baseValue, percentValue]);
 
   const calcolaSconto = () => {
     // Converti i valori in numeri
@@ -129,10 +171,45 @@ const CalcolaSconto = () => {
   };
 
   const formatCurrency = (value: number): string => {
+    if (valuta === "NONE") {
+      return value.toFixed(2);
+    }
+    
     return new Intl.NumberFormat('it-IT', {
       style: 'currency',
-      currency: 'EUR'
+      currency: valuta
     }).format(value);
+  };
+  
+  const shareResult = () => {
+    if (navigator.share) {
+      let text;
+      
+      if (risultatoPercentuale !== null) {
+        const labels = getLabelsByType();
+        text = `${labels.valore1}: ${valore1}\n${labels.valore2}: ${valore2}\n${labels.risultato}: ${
+          tipoCalcolo === "originale-risultato" 
+            ? `${risultatoPercentuale.toFixed(2)}%` 
+            : formatCurrency(risultatoPercentuale)
+        }`;
+      } else if (prezzo && sconto) {
+        text = `Prezzo originale: ${formatCurrency(parseFloat(prezzo))}\n` +
+               `Sconto: ${sconto}%\n` +
+               `Prezzo finale: ${formatCurrency(risultati.prezzoFinale)}`;
+      } else {
+        toast.error("Nessun risultato da condividere");
+        return;
+      }
+      
+      navigator.share({
+        title: "Calcolo Percentuale",
+        text: text
+      }).catch(() => {
+        toast.error("Impossibile condividere");
+      });
+    } else {
+      toast.error("Condivisione non supportata dal tuo browser");
+    }
   };
   
   const getLabelsByType = () => {
@@ -173,18 +250,34 @@ const CalcolaSconto = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
         <div className="lg:col-span-2">
+          <div className="flex justify-end mb-3">
+            <Select value={valuta} onValueChange={setValuta}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Scegli valuta" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="EUR">Euro (€)</SelectItem>
+                <SelectItem value="USD">Dollaro ($)</SelectItem>
+                <SelectItem value="GBP">Sterlina (£)</SelectItem>
+                <SelectItem value="JPY">Yen (¥)</SelectItem>
+                <SelectItem value="NONE">Nessuna</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
           <Tabs defaultValue="percentuale" className="w-full">
-            <TabsList className="grid grid-cols-2 mb-4">
-              <TabsTrigger value="percentuale">Calcolatore Percentuale</TabsTrigger>
-              <TabsTrigger value="sconto">Calcolatore Sconto</TabsTrigger>
+            <TabsList className="grid grid-cols-3 mb-4">
+              <TabsTrigger value="percentuale">Percentuale</TabsTrigger>
+              <TabsTrigger value="sconto">Sconto</TabsTrigger>
+              <TabsTrigger value="rapido">Rapido</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="percentuale" className="bg-white rounded-lg border p-6">
+            <TabsContent value="percentuale" className="bg-white rounded-lg border p-4 md:p-6">
               <h2 className="text-xl font-medium mb-4">Calcolatore Percentuale</h2>
               
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 <div>
                   <Label htmlFor="tipoCalcolo">Cosa vuoi calcolare?</Label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
@@ -212,7 +305,7 @@ const CalcolaSconto = () => {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="valore1">{getLabelsByType().valore1}</Label>
                     <Input
@@ -241,15 +334,26 @@ const CalcolaSconto = () => {
                   <p className="text-red-500 text-sm mt-2">{error}</p>
                 )}
                 
-                <Button
-                  onClick={calcolaPercentuale}
-                  disabled={!valore1 || !valore2}
-                  className="w-full mt-2"
-                >
-                  <Calculator className="mr-2 h-5 w-5" /> Calcola
-                </Button>
+                <div className="flex flex-col md:flex-row md:gap-4 space-y-2 md:space-y-0">
+                  <Button
+                    onClick={calcolaPercentuale}
+                    disabled={!valore1 || !valore2}
+                    className="w-full"
+                  >
+                    <Calculator className="mr-2 h-5 w-5" /> Calcola
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    disabled={risultatoPercentuale === null}
+                    onClick={shareResult}
+                    className="w-full"
+                  >
+                    <Share2 className="mr-2 h-5 w-5" /> Condividi
+                  </Button>
+                </div>
                 
-                <div className="bg-blue-50 p-6 rounded-lg mt-4">
+                <div className="bg-blue-50 p-4 md:p-6 rounded-lg mt-4">
                   <h3 className="text-lg font-medium mb-2">Risultato</h3>
                   <div>
                     <p className="text-gray-500 mb-1">{getLabelsByType().risultato}</p>
@@ -268,13 +372,13 @@ const CalcolaSconto = () => {
               </div>
             </TabsContent>
             
-            <TabsContent value="sconto" className="bg-white rounded-lg border p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <TabsContent value="sconto" className="bg-white rounded-lg border p-4 md:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div>
                   <h2 className="text-xl font-medium mb-4">Inserisci i dati</h2>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="prezzo">Prezzo originale (€)</Label>
+                      <Label htmlFor="prezzo">Prezzo originale ({simboloValuta})</Label>
                       <Input
                         id="prezzo"
                         type="number"
@@ -300,17 +404,28 @@ const CalcolaSconto = () => {
                     {error && (
                       <p className="text-red-500 text-sm mt-2">{error}</p>
                     )}
-                    <Button
-                      onClick={calcolaSconto}
-                      disabled={!prezzo || !sconto}
-                      className="w-full mt-2"
-                    >
-                      <Calculator className="mr-2 h-5 w-5" /> Calcola sconto
-                    </Button>
+                    <div className="flex flex-col md:flex-row gap-2">
+                      <Button
+                        onClick={calcolaSconto}
+                        disabled={!prezzo || !sconto}
+                        className="w-full"
+                      >
+                        <Calculator className="mr-2 h-5 w-5" /> Calcola sconto
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        disabled={!prezzo || !sconto}
+                        onClick={shareResult}
+                        className="w-full"
+                      >
+                        <Share2 className="mr-2 h-5 w-5" /> Condividi
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
-                <div className="bg-blue-50 p-6 rounded-lg">
+                <div className="bg-blue-50 p-4 md:p-6 rounded-lg">
                   <h2 className="text-xl font-medium mb-4">Risultati</h2>
                   <div className="space-y-4">
                     <div>
@@ -344,9 +459,9 @@ const CalcolaSconto = () => {
                 </div>
               </div>
 
-              <div className="mt-8">
+              <div className="mt-6">
                 <h3 className="font-medium mb-2">Esempi di sconti comuni</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                <div className="grid grid-cols-4 gap-2 mt-2">
                   {[5, 10, 15, 20, 25, 30, 40, 50].map(percentuale => (
                     <Button
                       key={percentuale}
@@ -355,6 +470,8 @@ const CalcolaSconto = () => {
                         setSconto(percentuale.toString());
                         if (prezzo) calcolaSconto();
                       }}
+                      className="text-sm h-9"
+                      size="sm"
                     >
                       {percentuale}%
                     </Button>
@@ -362,11 +479,69 @@ const CalcolaSconto = () => {
                 </div>
               </div>
             </TabsContent>
+            
+            <TabsContent value="rapido" className="bg-white rounded-lg border p-4 md:p-6">
+              <h2 className="text-xl font-medium mb-4">Calcolatrice Rapida</h2>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="baseValue">Valore</Label>
+                    <Input
+                      id="baseValue"
+                      type="number"
+                      placeholder="Es. 100"
+                      value={baseValue}
+                      onChange={(e) => setBaseValue(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="percentValue">Percentuale %</Label>
+                    <Input
+                      id="percentValue"
+                      type="number"
+                      placeholder="Es. 20"
+                      value={percentValue}
+                      onChange={(e) => setPercentValue(e.target.value)}
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[5, 10, 15, 20].map(percent => (
+                    <Button
+                      key={percent}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPercentValue(percent.toString())}
+                    >
+                      {percent}%
+                    </Button>
+                  ))}
+                </div>
+                
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-500">{baseValue || "0"} × {percentValue || "0"}%</p>
+                      <p className="text-2xl font-medium">
+                        {quickResult !== null ? formatCurrency(quickResult) : "—"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">{baseValue || "0"} + {percentValue || "0"}%</p>
+                      <p className="text-2xl font-medium">
+                        {baseValue && percentValue ? formatCurrency(parseFloat(baseValue) + (parseFloat(baseValue) * parseFloat(percentValue) / 100)) : "—"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
           </Tabs>
         </div>
 
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg border p-6 mb-6">
+          <div className="bg-white rounded-lg border p-4 md:p-6 mb-4">
             <h3 className="font-medium mb-4">Come funziona</h3>
             <Tabs defaultValue="percentuale" className="w-full">
               <TabsList className="grid grid-cols-2 mb-2">
@@ -381,15 +556,15 @@ const CalcolaSconto = () => {
                 <div className="space-y-3">
                   <div className="bg-gray-50 p-3 rounded-md">
                     <p className="text-sm mb-1">Valore finale:</p>
-                    <p className="font-mono">Originale × (1 + Percentuale ÷ 100)</p>
+                    <p className="font-mono text-xs sm:text-sm">Originale × (1 + Percentuale ÷ 100)</p>
                   </div>
                   <div className="bg-gray-50 p-3 rounded-md">
                     <p className="text-sm mb-1">Percentuale:</p>
-                    <p className="font-mono">((Risultato − Originale) ÷ Originale) × 100</p>
+                    <p className="font-mono text-xs sm:text-sm">((Risultato − Originale) ÷ Originale) × 100</p>
                   </div>
                   <div className="bg-gray-50 p-3 rounded-md">
                     <p className="text-sm mb-1">Valore originale:</p>
-                    <p className="font-mono">Risultato ÷ (1 + Percentuale ÷ 100)</p>
+                    <p className="font-mono text-xs sm:text-sm">Risultato ÷ (1 + Percentuale ÷ 100)</p>
                   </div>
                 </div>
               </TabsContent>
@@ -400,17 +575,17 @@ const CalcolaSconto = () => {
                 </p>
                 <div className="bg-gray-50 p-3 rounded-md mb-3">
                   <p className="text-sm mb-1">Importo dello sconto:</p>
-                  <p className="font-mono">Prezzo × (Percentuale ÷ 100)</p>
+                  <p className="font-mono text-xs sm:text-sm">Prezzo × (Percentuale ÷ 100)</p>
                 </div>
                 <div className="bg-gray-50 p-3 rounded-md">
                   <p className="text-sm mb-1">Prezzo finale:</p>
-                  <p className="font-mono">Prezzo − Importo dello sconto</p>
+                  <p className="font-mono text-xs sm:text-sm">Prezzo − Importo dello sconto</p>
                 </div>
               </TabsContent>
             </Tabs>
           </div>
 
-          <div className="ad-placeholder h-80">
+          <div className="ad-placeholder h-60 md:h-80">
             Spazio pubblicitario
           </div>
         </div>

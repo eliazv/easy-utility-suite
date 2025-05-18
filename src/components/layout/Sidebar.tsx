@@ -5,7 +5,7 @@ import { useSidebar } from "@/hooks/use-sidebar";
 import { 
   FileText, Calculator, KeyRound, Image, 
   Percent, AlignLeft, X, Calendar, Clock,
-  BarChart2, FileCode, FileSpreadsheet, FileImage,
+  BarChart2, FileSpreadsheet, FileImage,
   Clock3, QrCode, Wallet, Compass, Download
 } from "lucide-react";
 
@@ -162,13 +162,13 @@ const Sidebar = () => {
   return (
     <aside 
       className={cn(
-        "fixed md:sticky inset-y-0 left-0 z-20 flex h-full flex-col border-r bg-background transition-transform duration-300",
-        isOpen ? "translate-x-0 w-64" : "-translate-x-full md:translate-x-0 md:w-0 lg:w-64"
+        "fixed md:sticky inset-y-0 left-0 z-30 flex h-full flex-col border-r bg-background transition-transform duration-300",
+        isOpen ? "translate-x-0 w-72 md:w-64" : "-translate-x-full md:translate-x-0 md:w-16 lg:w-64"
       )}
     >
       <div className="sticky top-0 z-10 flex h-16 items-center gap-2 border-b bg-background px-4">
         <Link to="/" className="flex items-center gap-2 font-semibold">
-          <span className="text-xl font-bold">
+          <span className={cn("text-xl font-bold transition-opacity", !isOpen && "md:hidden lg:block")}>
             <span className="gradient-text">Tool</span>Kit
           </span>
         </Link>
@@ -180,11 +180,16 @@ const Sidebar = () => {
         </button>
       </div>
       
-      <div className="flex-1 overflow-auto py-2">
+      <div className="flex-1 overflow-auto py-2 scrollbar-thin">
         <nav className="grid gap-1 px-2">
           {toolGroups.map((group) => (
             <div className="px-3 py-2" key={group.id}>
-              <h3 className="mb-2 text-sm font-medium">{group.name}</h3>
+              <h3 className={cn(
+                "mb-2 text-sm font-medium transition-opacity",
+                !isOpen && "md:opacity-0 md:invisible lg:opacity-100 lg:visible"
+              )}>
+                {group.name}
+              </h3>
               <ul className="grid gap-1">
                 {group.tools.map((tool) => (
                   <li key={tool.path}>
@@ -194,9 +199,15 @@ const Sidebar = () => {
                         "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent",
                         location.pathname === tool.path ? "bg-accent" : "transparent"
                       )}
+                      title={!isOpen ? tool.name : undefined}
                     >
                       <span className={cn("flex-shrink-0", tool.color)}>{tool.icon}</span>
-                      <span>{tool.name}</span>
+                      <span className={cn(
+                        "transition-opacity",
+                        !isOpen && "md:hidden lg:inline"
+                      )}>
+                        {tool.name}
+                      </span>
                     </Link>
                   </li>
                 ))}
@@ -206,15 +217,26 @@ const Sidebar = () => {
           
           {additionalToolGroups.map((group) => (
             <div className="px-3 py-2" key={group.id}>
-              <h3 className="mb-2 text-sm font-medium text-muted-foreground">{group.name}</h3>
+              <h3 className={cn(
+                "mb-2 text-sm font-medium text-muted-foreground transition-opacity",
+                !isOpen && "md:opacity-0 md:invisible lg:opacity-100 lg:visible"
+              )}>
+                {group.name}
+              </h3>
               <ul className="grid gap-1">
                 {group.tools.map((tool) => (
                   <li key={tool.path}>
                     <span
                       className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground cursor-not-allowed"
+                      title={!isOpen ? tool.name : undefined}
                     >
                       <span className="flex-shrink-0 opacity-50">{tool.icon}</span>
-                      <span>{tool.name}</span>
+                      <span className={cn(
+                        "transition-opacity",
+                        !isOpen && "md:hidden lg:inline"
+                      )}>
+                        {tool.name}
+                      </span>
                     </span>
                   </li>
                 ))}
@@ -225,7 +247,12 @@ const Sidebar = () => {
       </div>
 
       <div className="sticky bottom-0 p-4">
-        <div className="ad-placeholder h-32">Spazio pubblicitario</div>
+        <div className={cn(
+          "ad-placeholder transition-all",
+          isOpen ? "h-32" : "h-0 md:h-0 lg:h-32 opacity-0 lg:opacity-100"
+        )}>
+          {isOpen ? "Spazio pubblicitario" : ""}
+        </div>
       </div>
     </aside>
   );

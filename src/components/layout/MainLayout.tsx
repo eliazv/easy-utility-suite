@@ -13,7 +13,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <Sidebar />
       <div className="flex flex-col flex-1">
         <TopBar />
-        <main className="flex-1 overflow-auto p-4 md:p-6 max-w-7xl mx-auto w-full">
+        <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 max-w-7xl mx-auto w-full">
           {children}
         </main>
         <footer className="p-4 text-center text-sm text-gray-500 border-t">
