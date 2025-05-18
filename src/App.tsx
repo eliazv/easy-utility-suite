@@ -22,6 +22,12 @@ import ConvertiValute from "./pages/tool-pages/ConvertiValute";
 import GeneraQRCode from "./pages/tool-pages/GeneraQRCode";
 import ComprimiImmagini from "./pages/tool-pages/ComprimiImmagini";
 import TimerCronometro from "./pages/tool-pages/TimerCronometro";
+// New tools
+import PomodoroTimer from "./pages/tool-pages/PomodoroTimer";
+import ColorPicker from "./pages/tool-pages/ColorPicker";
+import CalcolaDifferenzaDate from "./pages/tool-pages/CalcolaDifferenzaDate";
+import CalcolaMutuo from "./pages/tool-pages/CalcolaMutuo";
+import GeneratoreNumeri from "./pages/tool-pages/GeneratoreNumeri";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +53,8 @@ const App = () => (
             {/* Calcolatori */}
             <Route path="/calcola-sconto" element={<CalcolaSconto />} />
             <Route path="/calcola-bmi" element={<CalcolaBMI />} />
+            <Route path="/calcola-mutuo" element={<CalcolaMutuo />} />
+            <Route path="/calcola-differenza-date" element={<CalcolaDifferenzaDate />} />
             
             {/* Convertitori */}
             <Route path="/converti-date" element={<ConvertiDate />} />
@@ -56,9 +64,12 @@ const App = () => (
             {/* Sicurezza */}
             <Route path="/genera-password" element={<GeneraPassword />} />
             <Route path="/genera-qrcode" element={<GeneraQRCode />} />
+            <Route path="/genera-numeri" element={<GeneratoreNumeri />} />
             
             {/* Utilità */}
             <Route path="/timer-cronometro" element={<TimerCronometro />} />
+            <Route path="/timer-pomodoro" element={<PomodoroTimer />} />
+            <Route path="/color-picker" element={<ColorPicker />} />
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

@@ -8,7 +8,8 @@ import {
   BarChart2, FileSpreadsheet, FileImage,
   Clock3, QrCode, Wallet, Compass, Download,
   Palette, Ruler, Crosshair, MapPin, 
-  MessageSquare, Wifi, PenTool, SplitSquareVertical
+  MessageSquare, Wifi, PenTool, SplitSquareVertical,
+  Dice6
 } from "lucide-react";
 
 // Tool groups
@@ -82,6 +83,18 @@ const toolGroups = [
         icon: <SplitSquareVertical className="h-5 w-5" />,
         path: "/calcola-area",
         color: "text-tool-orange"
+      },
+      {
+        name: "Calcola differenza date",
+        icon: <Calendar className="h-5 w-5" />,
+        path: "/calcola-differenza-date",
+        color: "text-tool-blue"
+      },
+      {
+        name: "Calcola mutuo/debito",
+        icon: <FileSpreadsheet className="h-5 w-5" />,
+        path: "/calcola-mutuo",
+        color: "text-tool-red"
       }
     ]
   },
@@ -140,8 +153,14 @@ const toolGroups = [
       {
         name: "Generatore colori",
         icon: <Palette className="h-5 w-5" />,
-        path: "/generatore-colori",
+        path: "/color-picker",
         color: "text-tool-purple"
+      },
+      {
+        name: "Generatore numeri",
+        icon: <Dice6 className="h-5 w-5" />,
+        path: "/genera-numeri",
+        color: "text-tool-orange"
       }
     ]
   },
@@ -156,9 +175,15 @@ const toolGroups = [
         color: "text-tool-red"
       },
       {
+        name: "Timer Pomodoro",
+        icon: <Clock className="h-5 w-5" />,
+        path: "/timer-pomodoro",
+        color: "text-tool-red"
+      },
+      {
         name: "Generatore colori",
         icon: <Palette className="h-5 w-5" />,
-        path: "/generatore-colori", 
+        path: "/color-picker", 
         color: "text-tool-green"
       },
       {

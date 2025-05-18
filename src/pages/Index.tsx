@@ -7,7 +7,7 @@ import {
   Clock3, QrCode, Wallet, Compass,
   Download, Palette, Ruler, Crosshair, 
   MapPin, MessageSquare, Wifi, PenTool,
-  SplitSquareVertical
+  SplitSquareVertical, Dice6, FileSpreadsheet
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MainLayout from "@/components/layout/MainLayout";
@@ -73,18 +73,18 @@ const toolGroups = [
         color: "bg-orange-50 text-tool-orange"
       },
       {
-        name: "Convertitore unità",
-        description: "Converti facilmente tra diverse unità di misura",
-        icon: <Ruler className="h-10 w-10" />,
-        path: "/converti-unita",
-        color: "bg-orange-50 text-tool-orange"
+        name: "Calcolo differenza date",
+        description: "Calcola i giorni, mesi e anni tra due date diverse",
+        icon: <Calendar className="h-10 w-10" />,
+        path: "/calcola-differenza-date",
+        color: "bg-blue-50 text-tool-blue"
       },
       {
-        name: "Calcolatore area",
-        description: "Calcola l'area di diverse figure geometriche",
-        icon: <SplitSquareVertical className="h-10 w-10" />,
-        path: "/calcola-area",
-        color: "bg-orange-50 text-tool-orange"
+        name: "Calcolo mutuo/prestito",
+        description: "Calcola rate, interessi e piano di ammortamento",
+        icon: <FileSpreadsheet className="h-10 w-10" />,
+        path: "/calcola-mutuo",
+        color: "bg-red-50 text-tool-red"
       }
     ]
   },
@@ -144,8 +144,15 @@ const toolGroups = [
         name: "Generatore colori",
         description: "Crea, converti e gestisci colori in diversi formati",
         icon: <Palette className="h-10 w-10" />,
-        path: "/generatore-colori",
+        path: "/color-picker",
         color: "bg-purple-50 text-tool-purple"
+      },
+      {
+        name: "Generatore numeri casuali",
+        description: "Genera numeri casuali, serie o simula lanci di dadi",
+        icon: <Dice6 className="h-10 w-10" />,
+        path: "/genera-numeri",
+        color: "bg-orange-50 text-tool-orange"
       }
     ]
   },
@@ -161,11 +168,11 @@ const toolGroups = [
         color: "bg-red-50 text-tool-red"
       },
       {
-        name: "Condivisione wifi",
-        description: "Genera QR code per condividere facilmente la rete wifi",
-        icon: <Wifi className="h-10 w-10" />,
-        path: "/condividi-wifi",
-        color: "bg-blue-50 text-tool-blue"
+        name: "Timer Pomodoro",
+        description: "Utilizza la tecnica Pomodoro per migliorare la produttività",
+        icon: <Clock className="h-10 w-10" />,
+        path: "/timer-pomodoro",
+        color: "bg-red-50 text-tool-red"
       },
       {
         name: "Strumento disegno",
