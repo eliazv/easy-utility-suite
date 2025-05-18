@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { AlertCircle, Play, Pause, RotateCcw, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -123,51 +122,51 @@ const PomodoroTimer = () => {
 
   return (
     <MainLayout>
-      <div className="max-w-xl mx-auto p-4">
+      <div className="max-w-xl mx-auto p-2 sm:p-4">
         <h1 className="text-2xl font-bold mb-4">Timer Pomodoro</h1>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
           Usa il metodo Pomodoro per migliorare la tua produttività: lavora per 25 minuti e poi fai una pausa breve.
         </p>
         
-        <Tabs value={mode} onValueChange={(v) => switchMode(v as any)}>
-          <TabsList className="grid grid-cols-3 mb-6">
+        <Tabs value={mode} onValueChange={(v) => switchMode(v as any)} className="w-full">
+          <TabsList className="grid grid-cols-3 mb-4 sm:mb-6 w-full">
             <TabsTrigger value="pomodoro">Pomodoro</TabsTrigger>
             <TabsTrigger value="shortBreak">Pausa Breve</TabsTrigger>
             <TabsTrigger value="longBreak">Pausa Lunga</TabsTrigger>
           </TabsList>
         </Tabs>
 
-        <div className={`text-center p-8 rounded-lg mb-6 bg-opacity-10 ${
+        <div className={`text-center p-4 sm:p-8 rounded-lg mb-4 sm:mb-6 bg-opacity-10 ${
           mode === "pomodoro" ? "bg-red-100" : 
           mode === "shortBreak" ? "bg-green-100" : "bg-blue-100"
         }`}>
-          <h2 className="text-6xl font-bold mb-8">{formatTime(time)}</h2>
+          <h2 className="text-4xl sm:text-6xl font-bold mb-4 sm:mb-8">{formatTime(time)}</h2>
           
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-2 sm:gap-4">
             <Button
-              size="lg"
+              size="default"
               onClick={toggleTimer}
               className={isActive ? "bg-orange-600 hover:bg-orange-700" : "bg-green-600 hover:bg-green-700"}
             >
-              {isActive ? <Pause className="mr-2 h-5 w-5" /> : <Play className="mr-2 h-5 w-5" />}
+              {isActive ? <Pause className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> : <Play className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" />}
               {isActive ? "Pausa" : "Avvia"}
             </Button>
             
-            <Button variant="outline" size="lg" onClick={resetTimer}>
-              <RotateCcw className="mr-2 h-5 w-5" />
+            <Button variant="outline" onClick={resetTimer}>
+              <RotateCcw className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" />
               Reset
             </Button>
           </div>
         </div>
 
-        <div className="mb-6">
-          <h3 className="font-medium mb-2">Cicli completati: {Math.floor(cycles / 4)}</h3>
-          <p className="text-sm text-gray-600">Pomodoro corrente: {(cycles % 4) + 1}/4</p>
+        <div className="mb-4 sm:mb-6">
+          <h3 className="font-medium mb-1 sm:mb-2">Cicli completati: {Math.floor(cycles / 4)}</h3>
+          <p className="text-xs sm:text-sm text-gray-600">Pomodoro corrente: {(cycles % 4) + 1}/4</p>
         </div>
 
-        <div className="space-y-6 mb-6">
+        <div className="space-y-4 sm:space-y-6 mb-4 sm:mb-6">
           <div>
-            <label className="text-sm font-medium mb-2 block">
+            <label className="text-xs sm:text-sm font-medium mb-1 sm:mb-2 block">
               Durata Pomodoro: {settings.pomodoro} min
             </label>
             <Slider
@@ -176,12 +175,12 @@ const PomodoroTimer = () => {
               min={5}
               max={60}
               step={1}
-              className="my-4"
+              className="my-3 sm:my-4"
             />
           </div>
           
           <div>
-            <label className="text-sm font-medium mb-2 block">
+            <label className="text-xs sm:text-sm font-medium mb-1 sm:mb-2 block">
               Durata Pausa Breve: {settings.shortBreak} min
             </label>
             <Slider
@@ -190,12 +189,12 @@ const PomodoroTimer = () => {
               min={1}
               max={15}
               step={1}
-              className="my-4"
+              className="my-3 sm:my-4"
             />
           </div>
           
           <div>
-            <label className="text-sm font-medium mb-2 block">
+            <label className="text-xs sm:text-sm font-medium mb-1 sm:mb-2 block">
               Durata Pausa Lunga: {settings.longBreak} min
             </label>
             <Slider
@@ -204,15 +203,19 @@ const PomodoroTimer = () => {
               min={5}
               max={30}
               step={1}
-              className="my-4"
+              className="my-3 sm:my-4"
             />
           </div>
+        </div>
+        
+        <div className="ad-placeholder h-12 mb-4 sm:mb-6 text-xs sm:text-sm">
+          Spazio per banner pubblicitario
         </div>
         
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Cos'è il metodo Pomodoro?</AlertTitle>
-          <AlertDescription>
+          <AlertDescription className="text-xs sm:text-sm">
             Il metodo Pomodoro è una tecnica di gestione del tempo che utilizza timer per suddividere 
             il lavoro in intervalli di 25 minuti, separati da brevi pause. Dopo 4 "pomodori" si fa una 
             pausa più lunga. Questo metodo aiuta a mantenere la concentrazione e a combattere l'affaticamento mentale.

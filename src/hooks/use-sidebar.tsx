@@ -11,18 +11,20 @@ type SidebarContextType = {
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export const SidebarProvider = ({ children }: { children: ReactNode }) => {
-  // Inizializza isOpen in base alla larghezza dello schermo
+  // Initialize isOpen based on screen width
   const [isOpen, setIsOpen] = useState(() => {
-    // Su mobile parte chiuso, su desktop parte aperto
+    // On desktop start open, on mobile start closed
     return window.innerWidth >= 768;
   });
 
-  // Aggiorna isOpen quando cambia la dimensione della finestra
+  // Update isOpen when window size changes
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
         // Su desktop, mantieni sempre la sidebar visibile
         setIsOpen(true);
+      } else {
+        // On mobile, don't autoclose when resizing
       }
     };
 

@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/hooks/use-sidebar";
@@ -254,13 +253,14 @@ const Sidebar = () => {
   
   const handleLinkClick = () => {
     if (window.innerWidth < 768) {
+      // On mobile, close the sidebar when a link is clicked
       close();
     }
   };
   
   return (
     <>
-      {/* Overlay per chiudere la sidebar su mobile */}
+      {/* Overlay to close the sidebar on mobile */}
       {isOpen && (
         <div 
           className="fixed inset-0 bg-black/50 z-20 md:hidden" 

@@ -1,5 +1,5 @@
 
-import { Menu } from "lucide-react";
+import { Menu, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/hooks/use-sidebar";
 
@@ -29,8 +29,9 @@ const TopBar = () => {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm">
-          Feedback
+        <Button variant="outline" size="sm" className="flex items-center gap-1 bg-green-50 hover:bg-green-100 text-green-700 border-green-300">
+          <DollarSign className="h-4 w-4" />
+          <span className="hidden sm:inline">Donazione</span>
         </Button>
       </div>
     </div>

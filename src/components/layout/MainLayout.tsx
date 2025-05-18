@@ -13,15 +13,15 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const location = useLocation();
   const { close, isOpen } = useSidebar();
   
-  // Chiudi la sidebar quando cambia la rotta in modalità mobile
+  // Only close sidebar on route change in mobile mode if it's actually open
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
-    if (isMobile) {
+    if (isMobile && isOpen) {
       close();
     }
-  }, [location.pathname, close]);
+  }, [location.pathname, close, isOpen]);
 
-  // Impedisci lo scrolling del body quando la sidebar mobile è aperta
+  // Prevent body scrolling when mobile sidebar is open
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
     if (isMobile && isOpen) {
