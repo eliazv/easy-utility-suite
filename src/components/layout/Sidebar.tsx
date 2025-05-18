@@ -6,7 +6,8 @@ import {
   FileText, Calculator, KeyRound, Image, 
   Percent, AlignLeft, X, Calendar, Clock,
   BarChart2, FileSpreadsheet, FileImage,
-  Clock3, QrCode, Wallet, Compass, Download
+  Clock3, QrCode, Wallet, Compass, Download,
+  Palette, Ruler
 } from "lucide-react";
 
 // Tool groups
@@ -68,6 +69,12 @@ const toolGroups = [
         icon: <BarChart2 className="h-5 w-5" />,
         path: "/calcola-bmi",
         color: "text-tool-orange"
+      },
+      {
+        name: "Convertitore unità",
+        icon: <Ruler className="h-5 w-5" />,
+        path: "/converti-unita",
+        color: "text-tool-orange"
       }
     ]
   },
@@ -92,6 +99,12 @@ const toolGroups = [
         icon: <Wallet className="h-5 w-5" />,
         path: "/converti-valute",
         color: "text-tool-purple"
+      },
+      {
+        name: "Convertitore unità",
+        icon: <Ruler className="h-5 w-5" />,
+        path: "/converti-unita",
+        color: "text-tool-blue"
       }
     ]
   },
@@ -116,6 +129,12 @@ const toolGroups = [
         icon: <AlignLeft className="h-5 w-5" />,
         path: "/lorem-ipsum",
         color: "text-tool-red"
+      },
+      {
+        name: "Generatore colori",
+        icon: <Palette className="h-5 w-5" />,
+        path: "/generatore-colori",
+        color: "text-tool-purple"
       }
     ]
   },
@@ -128,6 +147,12 @@ const toolGroups = [
         icon: <Clock3 className="h-5 w-5" />,
         path: "/timer-cronometro",
         color: "text-tool-red"
+      },
+      {
+        name: "Generatore colori",
+        icon: <Palette className="h-5 w-5" />,
+        path: "/generatore-colori", 
+        color: "text-tool-green"
       }
     ]
   }
@@ -163,7 +188,9 @@ const Sidebar = () => {
     <aside 
       className={cn(
         "fixed md:sticky inset-y-0 left-0 z-30 flex h-full flex-col border-r bg-background transition-transform duration-300",
-        isOpen ? "translate-x-0 w-72 md:w-64" : "-translate-x-full md:translate-x-0 md:w-16 lg:w-64"
+        isOpen ? "translate-x-0 w-72 md:w-64" : "-translate-x-full md:translate-x-0 md:w-16 lg:w-64",
+        // Aggiungi uno strato di sfondo scuro quando la sidebar è aperta in mobile
+        isOpen ? "md:shadow-none shadow-xl" : ""
       )}
     >
       <div className="sticky top-0 z-10 flex h-16 items-center gap-2 border-b bg-background px-4">
@@ -180,6 +207,15 @@ const Sidebar = () => {
         </button>
       </div>
       
+      {/* Aggiunta di un overlay scuro per chiudere la sidebar quando si clicca fuori in modalità mobile */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-20 md:hidden" 
+          onClick={close}
+          aria-hidden="true"
+        />
+      )}
+      
       <div className="flex-1 overflow-auto py-2 scrollbar-thin">
         <nav className="grid gap-1 px-2">
           {toolGroups.map((group) => (
@@ -195,6 +231,12 @@ const Sidebar = () => {
                   <li key={tool.path}>
                     <Link
                       to={tool.path}
+                      onClick={() => {
+                        // Chiudi la sidebar in modalità mobile quando si seleziona uno strumento
+                        if (window.innerWidth < 768) {
+                          close();
+                        }
+                      }}
                       className={cn(
                         "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent",
                         location.pathname === tool.path ? "bg-accent" : "transparent"
@@ -203,7 +245,7 @@ const Sidebar = () => {
                     >
                       <span className={cn("flex-shrink-0", tool.color)}>{tool.icon}</span>
                       <span className={cn(
-                        "transition-opacity",
+                        "transition-opacity truncate",
                         !isOpen && "md:hidden lg:inline"
                       )}>
                         {tool.name}
@@ -232,7 +274,7 @@ const Sidebar = () => {
                     >
                       <span className="flex-shrink-0 opacity-50">{tool.icon}</span>
                       <span className={cn(
-                        "transition-opacity",
+                        "transition-opacity truncate",
                         !isOpen && "md:hidden lg:inline"
                       )}>
                         {tool.name}

@@ -3,13 +3,14 @@ import { Link } from "react-router-dom";
 import { 
   FileText, Calculator, KeyRound, Image, 
   Percent, AlignLeft, ArrowRight, Calendar,
-  Clock, BarChart2, FileCode, FileSpreadsheet,
-  QrCode, Wallet, Clock3, FileImage, Compass,
-  Download
+  Clock, BarChart2, FileImage,
+  Clock3, QrCode, Wallet, Compass,
+  Download, Palette, Ruler
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MainLayout from "@/components/layout/MainLayout";
 
+// Tool groups
 const toolGroups = [
   {
     id: "documents",
@@ -68,6 +69,13 @@ const toolGroups = [
         icon: <BarChart2 className="h-10 w-10" />,
         path: "/calcola-bmi",
         color: "bg-orange-50 text-tool-orange"
+      },
+      {
+        name: "Convertitore unità",
+        description: "Converti facilmente tra diverse unità di misura",
+        icon: <Ruler className="h-10 w-10" />,
+        path: "/converti-unita",
+        color: "bg-orange-50 text-tool-orange"
       }
     ]
   },
@@ -122,6 +130,13 @@ const toolGroups = [
         icon: <AlignLeft className="h-10 w-10" />,
         path: "/lorem-ipsum",
         color: "bg-red-50 text-tool-red"
+      },
+      {
+        name: "Generatore colori",
+        description: "Crea, converti e gestisci colori in diversi formati",
+        icon: <Palette className="h-10 w-10" />,
+        path: "/generatore-colori",
+        color: "bg-purple-50 text-tool-purple"
       }
     ]
   },

@@ -1,13 +1,26 @@
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
+import { useSidebar } from "@/hooks/use-sidebar";
 
 interface MainLayoutProps {
   children: ReactNode;
 }
 
 const MainLayout = ({ children }: MainLayoutProps) => {
+  const location = useLocation();
+  const { close } = useSidebar();
+  
+  // Chiudi la sidebar quando cambia la rotta in modalità mobile
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) {
+      close();
+    }
+  }, [location.pathname, close]);
+
   return (
     <div className="flex min-h-screen bg-gray-50/50">
       <Sidebar />
