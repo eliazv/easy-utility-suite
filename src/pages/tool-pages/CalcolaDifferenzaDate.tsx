@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Calendar as CalendarIcon, Clock, Calculator } from "lucide-react";
 import { format, differenceInDays, differenceInMonths, differenceInYears, addDays, isBefore } from "date-fns";
@@ -208,7 +207,7 @@ const CalcolaDifferenzaDate = () => {
               <div>
                 <h3 className="font-medium mb-2">Data di inizio</h3>
                 <ul className="space-y-1">
-                  <li><strong>Giorno dell'anno:</strong> {format(startDate, 'D', { locale: it })} di {format(new Date(startDate.getFullYear(), 11, 31), 'D', { locale: it })}</li>
+                  <li><strong>Giorno dell'anno:</strong> {format(startDate, 'd', { locale: it })} di {format(new Date(startDate.getFullYear(), 11, 31), 'd', { locale: it })}</li>
                   <li><strong>Settimana dell'anno:</strong> {format(startDate, 'w', { locale: it })}</li>
                   <li><strong>Trimestre:</strong> {Math.floor(startDate.getMonth() / 3) + 1}</li>
                 </ul>
@@ -216,7 +215,7 @@ const CalcolaDifferenzaDate = () => {
               <div>
                 <h3 className="font-medium mb-2">Data di fine</h3>
                 <ul className="space-y-1">
-                  <li><strong>Giorno dell'anno:</strong> {format(endDate, 'D', { locale: it })} di {format(new Date(endDate.getFullYear(), 11, 31), 'D', { locale: it })}</li>
+                  <li><strong>Giorno dell'anno:</strong> {format(endDate, 'd', { locale: it })} di {format(new Date(endDate.getFullYear(), 11, 31), 'd', { locale: it })}</li>
                   <li><strong>Settimana dell'anno:</strong> {format(endDate, 'w', { locale: it })}</li>
                   <li><strong>Trimestre:</strong> {Math.floor(endDate.getMonth() / 3) + 1}</li>
                 </ul>
