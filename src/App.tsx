@@ -28,11 +28,11 @@ import CalcolaDifferenzaDate from "./pages/tool-pages/CalcolaDifferenzaDate";
 import CalcolaMutuo from "./pages/tool-pages/CalcolaMutuo";
 import GeneratoreNumeri from "./pages/tool-pages/GeneratoreNumeri";
 import CalcolaArea from "./pages/tool-pages/CalcolaArea";
+import CalcoloDistanza from "./pages/tool-pages/CalcoloDistanza";
 
 // Commenting out the components that are causing errors until they're properly implemented
 // import Bussola from "./pages/tool-pages/Bussola";
 // import CoordinateGPS from "./pages/tool-pages/CoordinateGPS";
-// import CalcoloDistanza from "./pages/tool-pages/CalcoloDistanza";
 
 const queryClient = new QueryClient();
 
@@ -60,8 +60,7 @@ const App = () => (
             <Route path="/calcola-bmi" element={<CalcolaBMI />} />
             <Route path="/calcola-mutuo" element={<CalcolaMutuo />} />
             <Route path="/calcola-differenza-date" element={<CalcolaDifferenzaDate />} />
-            {/* Temporarily commenting out the routes that are causing errors */}
-            {/* <Route path="/calcolo-distanza" element={<CalcoloDistanza />} /> */}
+            <Route path="/calcolo-distanza" element={<CalcoloDistanza />} />
             <Route path="/calcola-area" element={<CalcolaArea />} />
             
             {/* Convertitori */}
@@ -83,7 +82,6 @@ const App = () => (
             {/* Temporarily commenting out the routes that are causing errors */}
             {/* <Route path="/bussola" element={<Bussola />} /> */}
             {/* <Route path="/coordinate-gps" element={<CoordinateGPS />} /> */}
-            {/* <Route path="/calcolo-distanza" element={<CalcoloDistanza />} /> */}
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

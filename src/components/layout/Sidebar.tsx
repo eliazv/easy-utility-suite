@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/hooks/use-sidebar";
@@ -273,7 +272,7 @@ const Sidebar = () => {
     
       <aside 
         className={cn(
-          "fixed md:sticky inset-y-0 left-0 z-30 flex h-full flex-col border-r bg-background transition-transform duration-300",
+          "fixed md:sticky inset-y-0 left-0 z-30 flex h-[100dvh] flex-col border-r bg-background transition-transform duration-300",
           isOpen ? "translate-x-0 w-72 md:w-64" : "-translate-x-full md:translate-x-0 md:w-16 lg:w-64",
           isOpen ? "md:shadow-none shadow-xl" : ""
         )}
@@ -292,74 +291,76 @@ const Sidebar = () => {
           </button>
         </div>
         
-        <ScrollArea className="flex-1 overflow-y-auto">
-          <nav className="grid gap-1 px-2">
-            {toolGroups.map((group) => (
-              <div className="px-3 py-2" key={group.id}>
-                <h3 className={cn(
-                  "mb-2 text-sm font-medium transition-opacity",
-                  !isOpen && "md:opacity-0 md:invisible lg:opacity-100 lg:visible"
-                )}>
-                  {group.name}
-                </h3>
-                <ul className="grid gap-1">
-                  {group.tools.map((tool) => (
-                    <li key={tool.path}>
-                      <Link
-                        to={tool.path}
-                        onClick={handleLinkClick}
-                        className={cn(
-                          "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent",
-                          location.pathname === tool.path ? "bg-accent" : "transparent"
-                        )}
-                        title={!isOpen ? tool.name : undefined}
-                      >
-                        <span className={cn("flex-shrink-0", tool.color)}>{tool.icon}</span>
-                        <span className={cn(
-                          "transition-opacity truncate",
-                          !isOpen && "md:hidden lg:inline"
-                        )}>
-                          {tool.name}
+        <ScrollArea className="flex-1 overflow-hidden">
+          <div className="h-full overflow-y-auto py-2">
+            <nav className="grid gap-1 px-2">
+              {toolGroups.map((group) => (
+                <div className="px-3 py-2" key={group.id}>
+                  <h3 className={cn(
+                    "mb-2 text-sm font-medium transition-opacity",
+                    !isOpen && "md:opacity-0 md:invisible lg:opacity-100 lg:visible"
+                  )}>
+                    {group.name}
+                  </h3>
+                  <ul className="grid gap-1">
+                    {group.tools.map((tool) => (
+                      <li key={tool.path}>
+                        <Link
+                          to={tool.path}
+                          onClick={handleLinkClick}
+                          className={cn(
+                            "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent",
+                            location.pathname === tool.path ? "bg-accent" : "transparent"
+                          )}
+                          title={!isOpen ? tool.name : undefined}
+                        >
+                          <span className={cn("flex-shrink-0", tool.color)}>{tool.icon}</span>
+                          <span className={cn(
+                            "transition-opacity truncate",
+                            !isOpen && "md:hidden lg:inline"
+                          )}>
+                            {tool.name}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+              
+              {additionalToolGroups.map((group) => (
+                <div className="px-3 py-2" key={group.id}>
+                  <h3 className={cn(
+                    "mb-2 text-sm font-medium text-muted-foreground transition-opacity",
+                    !isOpen && "md:opacity-0 md:invisible lg:opacity-100 lg:visible"
+                  )}>
+                    {group.name}
+                  </h3>
+                  <ul className="grid gap-1">
+                    {group.tools.map((tool) => (
+                      <li key={tool.path}>
+                        <span
+                          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground cursor-not-allowed"
+                          title={!isOpen ? tool.name : undefined}
+                        >
+                          <span className="flex-shrink-0 opacity-50">{tool.icon}</span>
+                          <span className={cn(
+                            "transition-opacity truncate",
+                            !isOpen && "md:hidden lg:inline"
+                          )}>
+                            {tool.name}
+                          </span>
                         </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-            
-            {additionalToolGroups.map((group) => (
-              <div className="px-3 py-2" key={group.id}>
-                <h3 className={cn(
-                  "mb-2 text-sm font-medium text-muted-foreground transition-opacity",
-                  !isOpen && "md:opacity-0 md:invisible lg:opacity-100 lg:visible"
-                )}>
-                  {group.name}
-                </h3>
-                <ul className="grid gap-1">
-                  {group.tools.map((tool) => (
-                    <li key={tool.path}>
-                      <span
-                        className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground cursor-not-allowed"
-                        title={!isOpen ? tool.name : undefined}
-                      >
-                        <span className="flex-shrink-0 opacity-50">{tool.icon}</span>
-                        <span className={cn(
-                          "transition-opacity truncate",
-                          !isOpen && "md:hidden lg:inline"
-                        )}>
-                          {tool.name}
-                        </span>
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </nav>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </nav>
+          </div>
         </ScrollArea>
 
-        <div className="sticky bottom-0 p-4">
+        <div className="sticky bottom-0 p-4 bg-background border-t">
           <div className={cn(
             "ad-placeholder transition-all",
             isOpen ? "h-32" : "h-0 md:h-0 lg:h-32 opacity-0 lg:opacity-100"

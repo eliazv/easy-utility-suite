@@ -23,9 +23,14 @@ export const SidebarProvider = ({ children }: { children: ReactNode }) => {
       if (window.innerWidth >= 768) {
         // Su desktop, mantieni sempre la sidebar visibile
         setIsOpen(true);
+      } else {
+        // On mobile, close sidebar when resizing to mobile
+        setIsOpen(false);
       }
-      // On mobile, don't autoclose when resizing, leave current state
     };
+
+    // Set initial state
+    handleResize();
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
