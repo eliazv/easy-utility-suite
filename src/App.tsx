@@ -22,12 +22,15 @@ import ConvertiValute from "./pages/tool-pages/ConvertiValute";
 import GeneraQRCode from "./pages/tool-pages/GeneraQRCode";
 import ComprimiImmagini from "./pages/tool-pages/ComprimiImmagini";
 import TimerCronometro from "./pages/tool-pages/TimerCronometro";
-// New tools
 import PomodoroTimer from "./pages/tool-pages/PomodoroTimer";
 import ColorPicker from "./pages/tool-pages/ColorPicker";
 import CalcolaDifferenzaDate from "./pages/tool-pages/CalcolaDifferenzaDate";
 import CalcolaMutuo from "./pages/tool-pages/CalcolaMutuo";
 import GeneratoreNumeri from "./pages/tool-pages/GeneratoreNumeri";
+// New pages for geographic tools
+import Bussola from "./pages/tool-pages/Bussola";
+import CoordinateGPS from "./pages/tool-pages/CoordinateGPS";
+import CalcoloDistanza from "./pages/tool-pages/CalcoloDistanza";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +58,7 @@ const App = () => (
             <Route path="/calcola-bmi" element={<CalcolaBMI />} />
             <Route path="/calcola-mutuo" element={<CalcolaMutuo />} />
             <Route path="/calcola-differenza-date" element={<CalcolaDifferenzaDate />} />
+            <Route path="/calcolo-distanza" element={<CalcoloDistanza />} />
             
             {/* Convertitori */}
             <Route path="/converti-date" element={<ConvertiDate />} />
@@ -70,6 +74,11 @@ const App = () => (
             <Route path="/timer-cronometro" element={<TimerCronometro />} />
             <Route path="/timer-pomodoro" element={<PomodoroTimer />} />
             <Route path="/color-picker" element={<ColorPicker />} />
+            
+            {/* Strumenti geografici */}
+            <Route path="/bussola" element={<Bussola />} />
+            <Route path="/coordinate-gps" element={<CoordinateGPS />} />
+            <Route path="/calcolo-distanza" element={<CalcoloDistanza />} />
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

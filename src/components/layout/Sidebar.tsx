@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/hooks/use-sidebar";
@@ -10,6 +11,7 @@ import {
   MessageSquare, Wifi, PenTool, SplitSquareVertical,
   Dice6
 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // Tool groups
 const toolGroups = [
@@ -249,7 +251,7 @@ const additionalToolGroups = [
 
 const Sidebar = () => {
   const location = useLocation();
-  const { isOpen, close } = useSidebar();
+  const { isOpen, close, toggle } = useSidebar();
   
   const handleLinkClick = () => {
     if (window.innerWidth < 768) {
@@ -290,7 +292,7 @@ const Sidebar = () => {
           </button>
         </div>
         
-        <div className="flex-1 overflow-auto py-2 scrollbar-thin">
+        <ScrollArea className="flex-1 py-2">
           <nav className="grid gap-1 px-2">
             {toolGroups.map((group) => (
               <div className="px-3 py-2" key={group.id}>
@@ -355,7 +357,7 @@ const Sidebar = () => {
               </div>
             ))}
           </nav>
-        </div>
+        </ScrollArea>
 
         <div className="sticky bottom-0 p-4">
           <div className={cn(
