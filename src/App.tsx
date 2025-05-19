@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,10 +26,7 @@ import ColorPicker from "./pages/tool-pages/ColorPicker";
 import CalcolaDifferenzaDate from "./pages/tool-pages/CalcolaDifferenzaDate";
 import CalcolaMutuo from "./pages/tool-pages/CalcolaMutuo";
 import GeneratoreNumeri from "./pages/tool-pages/GeneratoreNumeri";
-// New pages for geographic tools
-import Bussola from "./pages/tool-pages/Bussola";
-import CoordinateGPS from "./pages/tool-pages/CoordinateGPS";
-import CalcoloDistanza from "./pages/tool-pages/CalcoloDistanza";
+import CalcolaArea from "./pages/tool-pages/CalcolaArea";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +55,7 @@ const App = () => (
             <Route path="/calcola-mutuo" element={<CalcolaMutuo />} />
             <Route path="/calcola-differenza-date" element={<CalcolaDifferenzaDate />} />
             <Route path="/calcolo-distanza" element={<CalcoloDistanza />} />
+            <Route path="/calcola-area" element={<CalcolaArea />} />
             
             {/* Convertitori */}
             <Route path="/converti-date" element={<ConvertiDate />} />

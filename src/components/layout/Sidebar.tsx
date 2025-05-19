@@ -292,7 +292,7 @@ const Sidebar = () => {
           </button>
         </div>
         
-        <ScrollArea className="flex-1 py-2">
+        <ScrollArea className="flex-1 overflow-y-auto">
           <nav className="grid gap-1 px-2">
             {toolGroups.map((group) => (
               <div className="px-3 py-2" key={group.id}>

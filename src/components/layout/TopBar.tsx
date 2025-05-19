@@ -1,40 +1,63 @@
 
-import { Menu, DollarSign } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import { useSidebar } from "@/hooks/use-sidebar";
+import DonationModal from "@/components/DonationModal";
 
 const TopBar = () => {
-  const { toggle, isOpen } = useSidebar();
+  const { toggle } = useSidebar();
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
+  const [showDonationModal, setShowDonationModal] = useState(false);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Replace spaces with hyphens and convert to lowercase
+    const formattedSearch = searchValue.toLowerCase().replace(/\s+/g, "-");
+    
+    // Check if the search matches a route
+    if (formattedSearch) {
+      // Try to navigate to the route
+      navigate(`/${formattedSearch}`);
+      // Clear the search input
+      setSearchValue("");
+    }
+  };
 
   return (
-    <div className="sticky top-0 z-10 border-b bg-background px-4 h-16 flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={toggle} 
-          className="md:hidden"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
-        <div className="flex items-center gap-2 md:hidden">
-          <span className="font-bold text-xl">
-            <span className="gradient-text">Tool</span>Kit
-          </span>
+    <header className="border-b bg-background">
+      <div className="flex h-16 items-center px-4 gap-4">
+        <form onSubmit={handleSearch} className="flex-1 md:flex-initial md:w-64 lg:w-96">
+          <div className="relative">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Cerca uno strumento..."
+              className="pl-8"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+          </div>
+        </form>
+        
+        <div className="ml-auto flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowDonationModal(true)}
+          >
+            Supportaci
+          </Button>
         </div>
-      </div>
 
-      <div className="ad-placeholder h-10 flex-1 max-w-xl mx-6 hidden md:flex">
-        Banner pubblicitario
+        {/* Donation Modal */}
+        <DonationModal 
+          open={showDonationModal} 
+          onOpenChange={setShowDonationModal} 
+        />
       </div>
-
-      <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" className="flex items-center gap-1 bg-green-50 hover:bg-green-100 text-green-700 border-green-300">
-          <DollarSign className="h-4 w-4" />
-          <span className="hidden sm:inline">Donazione</span>
-        </Button>
-      </div>
-    </div>
+    </header>
   );
 };
 
