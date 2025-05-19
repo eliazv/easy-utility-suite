@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { MapPin, Copy, CheckCircle } from "lucide-react";
+import { MapPin, Copy } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -408,7 +408,7 @@ const CoordinateGPS = () => {
                         id="dms-lat"
                         value={dmsCoords.lat}
                         onChange={(e) => setDmsCoords({...dmsCoords, lat: e.target.value})}
-                        placeholder='Es. 45° 27\' 40.3" N'
+                        placeholder={"Es. 45° 27' 40.3\" N"}
                       />
                     </div>
                     <div>
@@ -417,7 +417,7 @@ const CoordinateGPS = () => {
                         id="dms-lng"
                         value={dmsCoords.lng}
                         onChange={(e) => setDmsCoords({...dmsCoords, lng: e.target.value})}
-                        placeholder='Es. 9° 11\' 23.1" E'
+                        placeholder={"Es. 9° 11' 23.1\" E"}
                       />
                     </div>
                   </div>
