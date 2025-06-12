@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,6 +28,7 @@ import CalcolaMutuo from "./pages/tool-pages/CalcolaMutuo";
 import GeneratoreNumeri from "./pages/tool-pages/GeneratoreNumeri";
 import CalcolaArea from "./pages/tool-pages/CalcolaArea";
 import CalcoloDistanza from "./pages/tool-pages/CalcoloDistanza";
+import RimuoviSfondo from "./pages/tool-pages/RimuoviSfondo";
 
 // Commenting out the components that are causing errors until they're properly implemented
 // import Bussola from "./pages/tool-pages/Bussola";
@@ -45,44 +45,51 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            
+
             {/* Documenti */}
             <Route path="/pdf-to-word" element={<PdfToWord />} />
             <Route path="/conta-caratteri" element={<ContaCaratteri />} />
             <Route path="/lorem-ipsum" element={<LoremIpsum />} />
-            
+
             {/* Immagini */}
-            <Route path="/ridimensiona-immagini" element={<RidimensionaImmagini />} />
+            <Route
+              path="/ridimensiona-immagini"
+              element={<RidimensionaImmagini />}
+            />
             <Route path="/comprimi-immagini" element={<ComprimiImmagini />} />
-            
+            <Route path="/rimuovi-sfondo" element={<RimuoviSfondo />} />
+
             {/* Calcolatori */}
             <Route path="/calcola-sconto" element={<CalcolaSconto />} />
             <Route path="/calcola-bmi" element={<CalcolaBMI />} />
             <Route path="/calcola-mutuo" element={<CalcolaMutuo />} />
-            <Route path="/calcola-differenza-date" element={<CalcolaDifferenzaDate />} />
+            <Route
+              path="/calcola-differenza-date"
+              element={<CalcolaDifferenzaDate />}
+            />
             <Route path="/calcolo-distanza" element={<CalcoloDistanza />} />
             <Route path="/calcola-area" element={<CalcolaArea />} />
-            
+
             {/* Convertitori */}
             <Route path="/converti-date" element={<ConvertiDate />} />
             <Route path="/converti-ore" element={<ConvertiOre />} />
             <Route path="/converti-valute" element={<ConvertiValute />} />
-            
+
             {/* Sicurezza */}
             <Route path="/genera-password" element={<GeneraPassword />} />
             <Route path="/genera-qrcode" element={<GeneraQRCode />} />
             <Route path="/genera-numeri" element={<GeneratoreNumeri />} />
-            
+
             {/* Utilità */}
             <Route path="/timer-cronometro" element={<TimerCronometro />} />
             <Route path="/timer-pomodoro" element={<PomodoroTimer />} />
             <Route path="/color-picker" element={<ColorPicker />} />
-            
+
             {/* Strumenti geografici */}
             {/* Temporarily commenting out the routes that are causing errors */}
             {/* <Route path="/bussola" element={<Bussola />} /> */}
             {/* <Route path="/coordinate-gps" element={<CoordinateGPS />} /> */}
-            
+
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
