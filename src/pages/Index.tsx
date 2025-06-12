@@ -33,6 +33,36 @@ import MainLayout from "@/components/layout/MainLayout";
 // Tool groups
 const toolGroups = [
   {
+    id: "images",
+    name: "Immagini",
+    tools: [
+      {
+        name: "Rimuovi sfondo",
+        description:
+          "Rimuovi automaticamente lo sfondo dalle foto con intelligenza artificiale - Converti in PNG con trasparenza",
+        icon: <Image className="h-10 w-10" />,
+        path: "/rimuovi-sfondo",
+        color: "bg-green-50 text-tool-green",
+      },
+      {
+        name: "Comprimi immagini",
+        description:
+          "Comprimi immagini JPEG, PNG, WEBP senza perdita di qualità - Ottimizza per web e social media",
+        icon: <FileImage className="h-10 w-10" />,
+        path: "/comprimi-immagini",
+        color: "bg-green-50 text-tool-green",
+      },
+      {
+        name: "Ridimensiona immagini",
+        description:
+          "Modifica le dimensioni delle tue immagini senza perdere qualità",
+        icon: <Image className="h-10 w-10" />,
+        path: "/ridimensiona-immagini",
+        color: "bg-green-50 text-tool-green",
+      },
+    ],
+  },
+  {
     id: "documents",
     name: "Documenti",
     tools: [
@@ -50,36 +80,6 @@ const toolGroups = [
         icon: <AlignLeft className="h-10 w-10" />,
         path: "/conta-caratteri",
         color: "bg-blue-50 text-tool-blue",
-      },
-    ],
-  },
-  {
-    id: "images",
-    name: "Immagini",
-    tools: [
-      {
-        name: "Ridimensiona immagini",
-        description:
-          "Modifica le dimensioni delle tue immagini senza perdere qualità",
-        icon: <Image className="h-10 w-10" />,
-        path: "/ridimensiona-immagini",
-        color: "bg-green-50 text-tool-green",
-      },
-      {
-        name: "Comprimi immagini",
-        description:
-          "Riduci la dimensione dei file immagine mantenendo una buona qualità",
-        icon: <FileImage className="h-10 w-10" />,
-        path: "/comprimi-immagini",
-        color: "bg-green-50 text-tool-green",
-      },
-      {
-        name: "Rimuovi sfondo",
-        description:
-          "Rimuovi lo sfondo con algoritmi avanzati di computer vision e converti in PNG",
-        icon: <Image className="h-10 w-10" />,
-        path: "/rimuovi-sfondo",
-        color: "bg-green-50 text-tool-green",
       },
     ],
   },
@@ -291,45 +291,6 @@ const Index = () => {
           </div>
         </section>
       ))}
-
-      <section className="mb-12">
-        <h2 className="text-2xl font-medium mb-6">In Arrivo</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="tool-card opacity-70">
-            <div className="flex items-start">
-              <div className="bg-blue-50 text-tool-blue p-3 rounded-md">
-                <MessageSquare className="h-10 w-10" />
-              </div>
-            </div>
-            <h3 className="text-xl font-medium mt-4">Traduttore testo</h3>
-            <p className="text-gray-500 mt-2 mb-4 flex-grow">
-              Traduci testi tra diverse lingue con traduzione automatica
-            </p>
-            <div className="flex justify-end mt-2">
-              <Button variant="ghost" className="gap-1" disabled>
-                Presto disponibile
-              </Button>
-            </div>
-          </div>
-
-          <div className="tool-card opacity-70">
-            <div className="flex items-start">
-              <div className="bg-green-50 text-tool-green p-3 rounded-md">
-                <Download className="h-10 w-10" />
-              </div>
-            </div>
-            <h3 className="text-xl font-medium mt-4">Download manager</h3>
-            <p className="text-gray-500 mt-2 mb-4 flex-grow">
-              Gestisci i download di file e archivi da varie fonti
-            </p>
-            <div className="flex justify-end mt-2">
-              <Button variant="ghost" className="gap-1" disabled>
-                Presto disponibile
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section className="mt-16">
         <div className="bg-blue-50 rounded-lg p-6 md:p-8">

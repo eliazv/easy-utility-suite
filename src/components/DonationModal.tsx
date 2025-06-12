@@ -1,6 +1,12 @@
-
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -17,7 +23,7 @@ const DONATION_AMOUNTS = [
   { value: "25", label: "€25" },
   { value: "50", label: "€50" },
   { value: "100", label: "€100" },
-  { value: "custom", label: "Altro importo" }
+  { value: "custom", label: "Altro importo" },
 ];
 
 export const DonationModal = ({ open, onOpenChange }: DonationModalProps) => {
@@ -27,18 +33,39 @@ export const DonationModal = ({ open, onOpenChange }: DonationModalProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleDonate = () => {
+    const amount = selectedAmount === "custom" ? customAmount : selectedAmount;
+
+    if (
+      !amount ||
+      (selectedAmount === "custom" &&
+        (!customAmount || parseFloat(customAmount) < 1))
+    ) {
+      toast({
+        title: "Importo non valido",
+        description: "Inserisci un importo valido per la donazione.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsProcessing(true);
-    
-    // Simulate processing
+
+    // Crea URL PayPal.me con l'importo della donazione
+    const paypalUrl = `https://www.paypal.com/paypalme/eliazavatta/${amount}EUR`;
+
+    // Reindirizza a PayPal
+    window.open(paypalUrl, "_blank");
+
     setTimeout(() => {
       setIsProcessing(false);
       onOpenChange(false);
-      
+
       toast({
-        title: "Grazie per la tua donazione!",
-        description: "La tua generosità ci aiuta a mantenere i nostri strumenti gratuiti per tutti."
+        title: "Reindirizzamento a PayPal",
+        description:
+          "Ti abbiamo reindirizzato a PayPal per completare la donazione. Grazie per il tuo supporto!",
       });
-    }, 1500);
+    }, 1000);
   };
 
   return (
@@ -47,22 +74,28 @@ export const DonationModal = ({ open, onOpenChange }: DonationModalProps) => {
         <DialogHeader>
           <DialogTitle>Sostieni il nostro progetto</DialogTitle>
           <DialogDescription>
-            La tua donazione ci aiuta a mantenere questi strumenti gratuiti e a sviluppare nuove funzionalità.
+            La tua donazione ci aiuta a mantenere questi strumenti gratuiti e a
+            sviluppare nuove funzionalità.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="py-4">
           <RadioGroup value={selectedAmount} onValueChange={setSelectedAmount}>
             <div className="grid grid-cols-2 gap-4">
               {DONATION_AMOUNTS.map((amount) => (
                 <div key={amount.value} className="flex items-center space-x-2">
-                  <RadioGroupItem value={amount.value} id={`amount-${amount.value}`} />
-                  <Label htmlFor={`amount-${amount.value}`}>{amount.label}</Label>
+                  <RadioGroupItem
+                    value={amount.value}
+                    id={`amount-${amount.value}`}
+                  />
+                  <Label htmlFor={`amount-${amount.value}`}>
+                    {amount.label}
+                  </Label>
                 </div>
               ))}
             </div>
           </RadioGroup>
-          
+
           {selectedAmount === "custom" && (
             <div className="mt-4">
               <Label htmlFor="custom-amount">Importo personalizzato (€)</Label>
@@ -81,21 +114,29 @@ export const DonationModal = ({ open, onOpenChange }: DonationModalProps) => {
               </div>
             </div>
           )}
-          
+
           <div className="mt-6 space-y-2">
             <div className="bg-blue-50 p-3 rounded-md">
-              <h4 className="font-medium text-blue-700">Il tuo supporto è importante</h4>
-              <p className="text-sm text-blue-600">Tutte le donazioni vengono utilizzate per il mantenimento e lo sviluppo della piattaforma.</p>
+              <h4 className="font-medium text-blue-700">
+                Il tuo supporto è importante
+              </h4>
+              <p className="text-sm text-blue-600">
+                Tutte le donazioni vengono utilizzate per il mantenimento e lo
+                sviluppo della piattaforma.
+              </p>
             </div>
-            
+
             <div className="text-sm text-gray-500">
-              Accettiamo pagamenti tramite carta di credito, PayPal e bonifico bancario.
+              Accettiamo pagamenti tramite carta di credito, PayPal e bonifico
+              bancario.
             </div>
           </div>
         </div>
-        
+
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Annulla</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Annulla
+          </Button>
           <Button onClick={handleDonate} disabled={isProcessing}>
             {isProcessing ? "Elaborazione..." : "Dona ora"}
           </Button>

@@ -34,6 +34,30 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 // Tool groups
 const toolGroups = [
   {
+    id: "images",
+    name: "Immagini",
+    tools: [
+      {
+        name: "Rimuovi sfondo",
+        icon: <Image className="h-5 w-5" />,
+        path: "/rimuovi-sfondo",
+        color: "text-tool-green",
+      },
+      {
+        name: "Comprimi immagini",
+        icon: <FileImage className="h-5 w-5" />,
+        path: "/comprimi-immagini",
+        color: "text-tool-green",
+      },
+      {
+        name: "Ridimensiona immagini",
+        icon: <Image className="h-5 w-5" />,
+        path: "/ridimensiona-immagini",
+        color: "text-tool-green",
+      },
+    ],
+  },
+  {
     id: "documents",
     name: "Documenti",
     tools: [
@@ -54,30 +78,6 @@ const toolGroups = [
         icon: <AlignLeft className="h-5 w-5" />,
         path: "/lorem-ipsum",
         color: "text-tool-purple",
-      },
-    ],
-  },
-  {
-    id: "images",
-    name: "Immagini",
-    tools: [
-      {
-        name: "Ridimensiona immagini",
-        icon: <Image className="h-5 w-5" />,
-        path: "/ridimensiona-immagini",
-        color: "text-tool-green",
-      },
-      {
-        name: "Comprimi immagini",
-        icon: <FileImage className="h-5 w-5" />,
-        path: "/comprimi-immagini",
-        color: "text-tool-green",
-      },
-      {
-        name: "Rimuovi sfondo",
-        icon: <Image className="h-5 w-5" />,
-        path: "/rimuovi-sfondo",
-        color: "text-tool-green",
       },
     ],
   },
@@ -251,28 +251,6 @@ const toolGroups = [
   },
 ];
 
-// Altri strumenti da aggiungere in futuro
-const additionalToolGroups = [
-  {
-    id: "coming-soon",
-    name: "In Arrivo",
-    tools: [
-      {
-        name: "Traduttore testo",
-        icon: <MessageSquare className="h-5 w-5" />,
-        path: "/traduttore",
-        color: "text-tool-blue",
-      },
-      {
-        name: "Download manager",
-        icon: <Download className="h-5 w-5" />,
-        path: "/download-manager",
-        color: "text-tool-green",
-      },
-    ],
-  },
-];
-
 const Sidebar = () => {
   const location = useLocation();
   const { isOpen, close, toggle } = useSidebar();
@@ -293,23 +271,30 @@ const Sidebar = () => {
           onClick={close}
           aria-hidden="true"
         />
-      )}
-
+      )}{" "}
       <aside
         className={cn(
-          "fixed md:sticky inset-y-0 left-0 z-30 flex h-[100dvh] flex-col border-r bg-background transition-transform duration-300",
-          isOpen
-            ? "translate-x-0 w-72 md:w-64"
-            : "-translate-x-full md:translate-x-0 md:w-16 lg:w-64",
-          isOpen ? "md:shadow-none shadow-xl" : ""
+          "fixed md:sticky inset-y-0 left-0 z-30 flex h-[100dvh] flex-col border-r bg-background transition-all duration-300",
+          // Su mobile: larghezza fissa e slide in/out
+          "w-72 md:w-auto",
+          // Mobile visibility
+          isOpen ? "translate-x-0" : "-translate-x-full",
+          // Desktop: sempre visibile, solo cambio larghezza
+          "md:translate-x-0",
+          isOpen ? "md:w-64" : "md:w-16",
+          // Shadow su mobile
+          isOpen && "shadow-xl md:shadow-none"
         )}
       >
+        {" "}
         <div className="sticky top-0 z-10 flex h-16 items-center gap-2 border-b bg-background px-4">
           <Link to="/" className="flex items-center gap-2 font-semibold">
             <span
               className={cn(
-                "text-xl font-bold transition-opacity",
-                !isOpen && "md:hidden lg:block"
+                "text-xl font-bold transition-opacity duration-300",
+                isOpen
+                  ? "opacity-100"
+                  : "md:opacity-0 md:w-0 md:overflow-hidden"
               )}
             >
               <span className="gradient-text">Tool</span>Kit
@@ -322,17 +307,18 @@ const Sidebar = () => {
             <X className="h-4 w-4" />
           </button>
         </div>
-
         <ScrollArea className="flex-1 overflow-hidden">
           <div className="h-full overflow-y-auto py-2">
             <nav className="grid gap-1 px-2">
               {toolGroups.map((group) => (
                 <div className="px-3 py-2" key={group.id}>
+                  {" "}
                   <h3
                     className={cn(
-                      "mb-2 text-sm font-medium transition-opacity",
-                      !isOpen &&
-                        "md:opacity-0 md:invisible lg:opacity-100 lg:visible"
+                      "mb-2 text-sm font-medium transition-all duration-300",
+                      isOpen
+                        ? "opacity-100"
+                        : "md:opacity-0 md:h-0 md:mb-0 md:overflow-hidden"
                     )}
                   >
                     {group.name}
@@ -353,11 +339,13 @@ const Sidebar = () => {
                         >
                           <span className={cn("flex-shrink-0", tool.color)}>
                             {tool.icon}
-                          </span>
+                          </span>{" "}
                           <span
                             className={cn(
-                              "transition-opacity truncate",
-                              !isOpen && "md:hidden lg:inline"
+                              "transition-all duration-300 truncate",
+                              isOpen
+                                ? "opacity-100 w-auto"
+                                : "md:opacity-0 md:w-0 md:overflow-hidden"
                             )}
                           >
                             {tool.name}
@@ -368,54 +356,20 @@ const Sidebar = () => {
                   </ul>
                 </div>
               ))}
-
-              {additionalToolGroups.map((group) => (
-                <div className="px-3 py-2" key={group.id}>
-                  <h3
-                    className={cn(
-                      "mb-2 text-sm font-medium text-muted-foreground transition-opacity",
-                      !isOpen &&
-                        "md:opacity-0 md:invisible lg:opacity-100 lg:visible"
-                    )}
-                  >
-                    {group.name}
-                  </h3>
-                  <ul className="grid gap-1">
-                    {group.tools.map((tool) => (
-                      <li key={tool.path}>
-                        <span
-                          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground cursor-not-allowed"
-                          title={!isOpen ? tool.name : undefined}
-                        >
-                          <span className="flex-shrink-0 opacity-50">
-                            {tool.icon}
-                          </span>
-                          <span
-                            className={cn(
-                              "transition-opacity truncate",
-                              !isOpen && "md:hidden lg:inline"
-                            )}
-                          >
-                            {tool.name}
-                          </span>
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
             </nav>
           </div>
         </ScrollArea>
-
         <div className="sticky bottom-0 p-4 bg-background border-t">
+          {" "}
           <div
             className={cn(
-              "ad-placeholder transition-all",
-              isOpen ? "h-32" : "h-0 md:h-0 lg:h-32 opacity-0 lg:opacity-100"
+              "ad-placeholder transition-all duration-300",
+              isOpen
+                ? "h-32 opacity-100"
+                : "md:h-0 md:opacity-0 md:overflow-hidden h-32"
             )}
           >
-            {isOpen ? "Spazio pubblicitario" : ""}
+            {isOpen && "Spazio pubblicitario"}
           </div>
         </div>
       </aside>

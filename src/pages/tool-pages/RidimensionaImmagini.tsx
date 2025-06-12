@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -19,13 +18,36 @@ const RidimensionaImmagini = () => {
   const [imageFormat, setImageFormat] = useState("jpeg");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [resizedImage, setResizedImage] = useState<string | null>(null);
+  const [isDragActive, setIsDragActive] = useState<boolean>(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      
+  // Gestori per il drag and drop
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const droppedFile = e.dataTransfer.files[0];
+
       // Controlla se il file è un'immagine
-      if (!selectedFile.type.startsWith('image/')) {
+      if (!droppedFile.type.startsWith("image/")) {
         toast({
           title: "Errore",
           description: "Seleziona un file immagine valido",
@@ -33,16 +55,52 @@ const RidimensionaImmagini = () => {
         });
         return;
       }
-      
-      setImage(selectedFile);
+
+      setImage(droppedFile);
       setResizedImage(null);
-      
+
       // Crea un URL per l'anteprima dell'immagine
       const reader = new FileReader();
       reader.onload = (e) => {
         if (e.target?.result) {
           setPreview(e.target.result as string);
-          
+
+          // Carica l'immagine per ottenere le dimensioni originali
+          const img = new window.Image();
+          img.src = e.target.result as string;
+          img.onload = () => {
+            setDimensions({ width: img.width, height: img.height });
+            setNewDimensions({ width: img.width, height: img.height });
+          };
+        }
+      };
+      reader.readAsDataURL(droppedFile);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const selectedFile = e.target.files[0];
+
+      // Controlla se il file è un'immagine
+      if (!selectedFile.type.startsWith("image/")) {
+        toast({
+          title: "Errore",
+          description: "Seleziona un file immagine valido",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setImage(selectedFile);
+      setResizedImage(null);
+
+      // Crea un URL per l'anteprima dell'immagine
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setPreview(e.target.result as string);
+
           // Carica l'immagine per ottenere le dimensioni originali
           const img = new window.Image();
           img.src = e.target.result as string;
@@ -58,7 +116,7 @@ const RidimensionaImmagini = () => {
 
   const handleWidthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const width = parseInt(e.target.value) || 0;
-    
+
     if (maintainAspectRatio && dimensions.width) {
       const ratio = dimensions.height / dimensions.width;
       const height = Math.round(width * ratio);
@@ -70,7 +128,7 @@ const RidimensionaImmagini = () => {
 
   const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const height = parseInt(e.target.value) || 0;
-    
+
     if (maintainAspectRatio && dimensions.height) {
       const ratio = dimensions.width / dimensions.height;
       const width = Math.round(height * ratio);
@@ -84,26 +142,29 @@ const RidimensionaImmagini = () => {
     if (!preview || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    
+    const ctx = canvas.getContext("2d");
+
     if (!ctx) return;
-    
+
     // Crea un'immagine con l'anteprima
     const img = new window.Image();
     img.src = preview;
-    
+
     img.onload = () => {
       // Imposta le dimensioni del canvas
       canvas.width = newDimensions.width;
       canvas.height = newDimensions.height;
-      
+
       // Disegna l'immagine ridimensionata sul canvas
       ctx.drawImage(img, 0, 0, newDimensions.width, newDimensions.height);
-      
+
       // Converti il canvas in un'immagine
-      const resized = canvas.toDataURL(`image/${imageFormat}`, imageQuality / 100);
+      const resized = canvas.toDataURL(
+        `image/${imageFormat}`,
+        imageQuality / 100
+      );
       setResizedImage(resized);
-      
+
       toast({
         title: "Immagine ridimensionata",
         description: `Nuove dimensioni: ${newDimensions.width}x${newDimensions.height}px`,
@@ -113,8 +174,8 @@ const RidimensionaImmagini = () => {
 
   const downloadImage = () => {
     if (!resizedImage) return;
-    
-    const link = document.createElement('a');
+
+    const link = document.createElement("a");
     link.download = `resized-image.${imageFormat}`;
     link.href = resizedImage;
     link.click();
@@ -125,28 +186,42 @@ const RidimensionaImmagini = () => {
       <div className="tool-header">
         <h1>Ridimensiona immagini</h1>
         <p className="text-gray-600 mt-2">
-          Ridimensiona facilmente le tue immagini mantenendo la qualità. 
+          Ridimensiona facilmente le tue immagini mantenendo la qualità.
           Supporta formati JPEG, PNG e altri formati comuni.
         </p>
       </div>
 
-      <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
+      <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg border p-6">
+            {" "}
             <div className="mb-6">
-              <h2 className="text-xl font-medium mb-2">1. Carica un'immagine</h2>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+              <h2 className="text-xl font-medium mb-2">
+                1. Carica un'immagine
+              </h2>
+              <div
+                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                  isDragActive
+                    ? "border-blue-400 bg-blue-50"
+                    : "border-gray-300 hover:border-gray-400"
+                }`}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+              >
                 {preview ? (
                   <div className="flex flex-col items-center">
-                    <img 
-                      src={preview} 
-                      alt="Anteprima" 
+                    <img
+                      src={preview}
+                      alt="Anteprima"
                       className="max-w-full max-h-64 mb-4 object-contain"
                     />
                     <p className="text-sm text-gray-500 mb-2">
-                      Dimensioni originali: {dimensions.width} x {dimensions.height} px
+                      Dimensioni originali: {dimensions.width} x{" "}
+                      {dimensions.height} px
                     </p>
                     <div className="flex gap-2">
                       <Button
@@ -163,7 +238,9 @@ const RidimensionaImmagini = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => document.getElementById("image-upload")?.click()}
+                        onClick={() =>
+                          document.getElementById("image-upload")?.click()
+                        }
                       >
                         Cambia immagine
                       </Button>
@@ -171,16 +248,32 @@ const RidimensionaImmagini = () => {
                   </div>
                 ) : (
                   <div>
-                    <Upload className="mx-auto h-12 w-12 text-gray-400 mb-2" />
-                    <p className="text-gray-600 mb-2">
-                      Trascina qui la tua immagine o
-                    </p>
-                    <Button
-                      variant="outline"
-                      onClick={() => document.getElementById("image-upload")?.click()}
+                    <Upload
+                      className={`mx-auto h-12 w-12 mb-2 ${
+                        isDragActive ? "text-blue-500" : "text-gray-400"
+                      }`}
+                    />
+                    <p
+                      className={`mb-2 ${
+                        isDragActive
+                          ? "text-blue-600 font-medium"
+                          : "text-gray-600"
+                      }`}
                     >
-                      Seleziona immagine
-                    </Button>
+                      {isDragActive
+                        ? "Rilascia qui la tua immagine"
+                        : "Trascina qui la tua immagine o"}
+                    </p>
+                    {!isDragActive && (
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          document.getElementById("image-upload")?.click()
+                        }
+                      >
+                        Seleziona immagine
+                      </Button>
+                    )}
                     <input
                       id="image-upload"
                       type="file"
@@ -195,11 +288,12 @@ const RidimensionaImmagini = () => {
                 )}
               </div>
             </div>
-
             {preview && (
               <>
                 <div className="mb-6">
-                  <h2 className="text-xl font-medium mb-4">2. Imposta nuove dimensioni</h2>
+                  <h2 className="text-xl font-medium mb-4">
+                    2. Imposta nuove dimensioni
+                  </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                       <Label htmlFor="width">Larghezza (px)</Label>
@@ -233,7 +327,9 @@ const RidimensionaImmagini = () => {
                 </div>
 
                 <div className="mb-6">
-                  <h2 className="text-xl font-medium mb-4">3. Opzioni avanzate</h2>
+                  <h2 className="text-xl font-medium mb-4">
+                    3. Opzioni avanzate
+                  </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="format">Formato immagine</Label>
@@ -259,7 +355,9 @@ const RidimensionaImmagini = () => {
                           min="10"
                           max="100"
                           value={imageQuality}
-                          onChange={(e) => setImageQuality(parseInt(e.target.value))}
+                          onChange={(e) =>
+                            setImageQuality(parseInt(e.target.value))
+                          }
                           className="w-full"
                         />
                       </div>
@@ -283,7 +381,8 @@ const RidimensionaImmagini = () => {
                         className="max-w-full max-h-64 mb-4 object-contain"
                       />
                       <p className="text-sm text-gray-500 mb-4">
-                        Nuove dimensioni: {newDimensions.width} x {newDimensions.height} px
+                        Nuove dimensioni: {newDimensions.width} x{" "}
+                        {newDimensions.height} px
                       </p>
                       <Button onClick={downloadImage}>
                         <Download className="h-5 w-5 mr-2" /> Scarica immagine
@@ -327,9 +426,7 @@ const RidimensionaImmagini = () => {
             </ul>
           </div>
 
-          <div className="ad-placeholder h-80">
-            Spazio pubblicitario
-          </div>
+          <div className="ad-placeholder h-80">Spazio pubblicitario</div>
         </div>
       </div>
     </MainLayout>

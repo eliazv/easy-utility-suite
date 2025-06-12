@@ -11,9 +11,11 @@ import {
   Image as ImageIcon,
   Trash,
   RefreshCw,
+  Archive,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import JSZip from "jszip";
 
 const RimuoviSfondo = () => {
   const { toast } = useToast();
@@ -22,59 +24,93 @@ const RimuoviSfondo = () => {
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [tolerance, setTolerance] = useState(40);
-
-  // Batch processing state
-  const [batchImages, setBatchImages] = useState<File[]>([]);
-  const [processedBatchImages, setProcessedBatchImages] = useState<
+  // Processing state (unificato per singola e multiple)
+  const [images, setImages] = useState<File[]>([]);
+  const [processedImages, setProcessedImages] = useState<
     { file: File; processed: string; originalUrl: string }[]
   >([]);
-  const [batchLoading, setBatchLoading] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const [currentProcessing, setCurrentProcessing] = useState<number>(0);
-  const [processingMode, setProcessingMode] = useState<"single" | "batch">(
-    "single"
-  );
+  const [isDragActive, setIsDragActive] = useState<boolean>(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
 
-      // Controlla se il file è un'immagine
-      if (!selectedFile.type.startsWith("image/")) {
-        toast({
-          title: "Errore",
-          description: "Seleziona un file immagine valido",
-          variant: "destructive",
-        });
-        return;
-      }
+  // Gestori per il drag and drop
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(true);
+  };
 
-      // Controlla la dimensione del file (max 10MB)
-      if (selectedFile.size > 10 * 1024 * 1024) {
-        toast({
-          title: "Errore",
-          description: "Il file è troppo grande. Dimensione massima: 10MB",
-          variant: "destructive",
-        });
-        return;
-      }
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+  };
 
-      setImage(selectedFile);
-      setProcessedImage(null);
-      setProcessingMode("single");
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
-      // Crea un URL per l'anteprima dell'immagine
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setPreview(e.target.result as string);
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const droppedFiles = Array.from(e.dataTransfer.files);
+
+      // Filtra solo le immagini e limita a 50
+      const imageFiles = droppedFiles
+        .filter((file) => file.type.startsWith("image/"))
+        .slice(0, 50);
+
+      // Controlla che ogni file non superi 10MB
+      const validFiles = imageFiles.filter((file) => {
+        if (file.size > 10 * 1024 * 1024) {
+          toast({
+            title: "File troppo grande",
+            description: `${file.name} supera 10MB ed è stato escluso`,
+            variant: "destructive",
+            duration: 4000,
+          });
+          return false;
         }
-      };
-      reader.readAsDataURL(selectedFile);
+        return true;
+      });
+
+      if (validFiles.length !== droppedFiles.length) {
+        toast({
+          title: "Alcuni file esclusi",
+          description: `${validFiles.length} di ${droppedFiles.length} file sono stati caricati`,
+          duration: 4000,
+        });
+      }
+
+      if (validFiles.length > 0) {
+        setImages(validFiles);
+        setProcessedImages([]);
+        setImage(validFiles[0] || null);
+        setProcessedImage(null);
+
+        // Crea preview per la prima immagine
+        if (validFiles[0]) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            if (e.target?.result) {
+              setPreview(e.target.result as string);
+            }
+          };
+          reader.readAsDataURL(validFiles[0]);
+        } else {
+          setPreview(null);
+        }
+      }
     }
   };
 
-  const handleBatchFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFiles = Array.from(e.target.files);
 
@@ -90,6 +126,7 @@ const RimuoviSfondo = () => {
             title: "File troppo grande",
             description: `${file.name} supera 10MB ed è stato escluso`,
             variant: "destructive",
+            duration: 4000,
           });
           return false;
         }
@@ -100,17 +137,27 @@ const RimuoviSfondo = () => {
         toast({
           title: "Alcuni file esclusi",
           description: `${validFiles.length} di ${selectedFiles.length} file sono stati caricati`,
+          duration: 4000,
         });
       }
 
-      setBatchImages(validFiles);
-      setProcessedBatchImages([]);
-      setProcessingMode("batch");
-
-      // Reset single image state
-      setImage(null);
-      setPreview(null);
+      setImages(validFiles);
+      setProcessedImages([]);
+      setImage(validFiles[0] || null);
       setProcessedImage(null);
+
+      // Crea preview per la prima immagine
+      if (validFiles[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target?.result) {
+            setPreview(e.target.result as string);
+          }
+        };
+        reader.readAsDataURL(validFiles[0]);
+      } else {
+        setPreview(null);
+      }
     }
   };
   // Algoritmo di segmentazione del colore migliorato
@@ -388,62 +435,117 @@ const RimuoviSfondo = () => {
       img.src = imageUrl;
     });
   };
+  // Funzione per processare tutte le immagini
+  const processImages = async () => {
+    if (images.length === 0) return;
 
-  // Funzione per processare tutte le immagini in batch
-  const processBatchImages = async () => {
-    if (batchImages.length === 0) return;
-
-    setBatchLoading(true);
+    setProcessing(true);
     setCurrentProcessing(0);
     const processed: { file: File; processed: string; originalUrl: string }[] =
       [];
 
-    for (let i = 0; i < batchImages.length; i++) {
+    for (let i = 0; i < images.length; i++) {
       try {
         setCurrentProcessing(i + 1);
 
         // Crea URL per l'immagine corrente
-        const originalUrl = URL.createObjectURL(batchImages[i]);
+        const originalUrl = URL.createObjectURL(images[i]);
 
         // Processa l'immagine
         const processedUrl = await processImageData(originalUrl);
 
         processed.push({
-          file: batchImages[i],
+          file: images[i],
           processed: processedUrl,
           originalUrl: originalUrl,
         });
 
+        // Se è una singola immagine, aggiorna anche il preview
+        if (images.length === 1) {
+          setProcessedImage(processedUrl);
+        }
+
         // Pausa breve per non bloccare l'UI
         await new Promise((resolve) => setTimeout(resolve, 100));
       } catch (error) {
-        console.error(`Errore processando ${batchImages[i].name}:`, error);
+        console.error(`Errore processando ${images[i].name}:`, error);
         toast({
           title: "Errore nell'elaborazione",
-          description: `Impossibile processare ${batchImages[i].name}`,
+          description: `Impossibile processare ${images[i].name}`,
           variant: "destructive",
+          duration: 4000,
         });
       }
     }
 
-    setProcessedBatchImages(processed);
-    setBatchLoading(false);
+    setProcessedImages(processed);
+    setProcessing(false);
     setCurrentProcessing(0);
 
     toast({
       title: "Elaborazione completata",
-      description: `${processed.length} di ${batchImages.length} immagini elaborate con successo`,
+      description: `${processed.length} di ${images.length} immagini elaborate con successo`,
+      duration: 4000,
     });
-  };
-
-  // Funzione per scaricare tutte le immagini processate
+  }; // Funzione per scaricare tutte le immagini processate
   const downloadAllProcessedImages = async () => {
-    if (processedBatchImages.length === 0) return;
+    if (processedImages.length === 0) return;
 
-    // Crea uno ZIP usando JSZip (aggiungeremo la dipendenza se necessario)
-    // Per ora, scarica le immagini una per una
-    for (let i = 0; i < processedBatchImages.length; i++) {
-      const item = processedBatchImages[i];
+    try {
+      // Crea un nuovo file ZIP
+      const zip = new JSZip();
+
+      // Aggiungi ogni immagine al ZIP
+      for (let i = 0; i < processedImages.length; i++) {
+        const item = processedImages[i];
+
+        // Converti data URL in blob
+        const response = await fetch(item.processed);
+        const blob = await response.blob();
+
+        // Nome del file
+        const fileName = item.file.name.replace(/\.[^/.]+$/, "") + "_no_bg.png";
+
+        // Aggiungi al ZIP
+        zip.file(fileName, blob);
+      }
+
+      // Genera il file ZIP
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+
+      // Scarica il file ZIP
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(zipBlob);
+      link.href = url;
+      link.download = `immagini_senza_sfondo_${new Date()
+        .toISOString()
+        .slice(0, 10)}.zip`;
+      link.click();
+
+      // Pulisci l'URL
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Download ZIP completato",
+        description: `${processedImages.length} immagini scaricate in un file ZIP`,
+        duration: 4000,
+      });
+    } catch (error) {
+      console.error("Errore nella creazione del ZIP:", error);
+      toast({
+        title: "Errore download ZIP",
+        description:
+          "Impossibile creare il file ZIP. Prova a scaricare le immagini singolarmente.",
+        variant: "destructive",
+        duration: 4000,
+      });
+    }
+  }; // Funzione per scaricare singole immagini (fallback)
+  const downloadSingleImages = async () => {
+    if (processedImages.length === 0) return;
+
+    for (let i = 0; i < processedImages.length; i++) {
+      const item = processedImages[i];
       const link = document.createElement("a");
       const fileName = item.file.name.replace(/\.[^/.]+$/, "") + "_no_bg.png";
       link.download = fileName;
@@ -455,10 +557,12 @@ const RimuoviSfondo = () => {
     }
 
     toast({
-      title: "Download completato",
-      description: `${processedBatchImages.length} immagini scaricate`,
+      title: "Download singoli completato",
+      description: `${processedImages.length} immagini scaricate separatamente`,
+      duration: 4000,
     });
   };
+
   const removeBackground = async () => {
     if (!image || !preview) return;
 
@@ -646,11 +750,11 @@ const RimuoviSfondo = () => {
           setProcessedImage(processedDataUrl);
 
           setLoading(false);
-
           toast({
             title: "Sfondo rimosso",
             description:
               "Lo sfondo è stato rimosso con algoritmi avanzati di computer vision. L'immagine è stata convertita in PNG.",
+            duration: 4000,
           });
         } catch (error) {
           console.error("Errore durante l'elaborazione:", error);
@@ -660,6 +764,7 @@ const RimuoviSfondo = () => {
             description:
               "Si è verificato un errore durante l'elaborazione dell'immagine. Prova con un'immagine più piccola.",
             variant: "destructive",
+            duration: 4000,
           });
         }
       };
@@ -670,6 +775,7 @@ const RimuoviSfondo = () => {
           title: "Errore",
           description: "Impossibile caricare l'immagine",
           variant: "destructive",
+          duration: 4000,
         });
       };
 
@@ -682,6 +788,7 @@ const RimuoviSfondo = () => {
         description:
           "Si è verificato un errore durante l'elaborazione dell'immagine",
         variant: "destructive",
+        duration: 4000,
       });
     }
   };
@@ -693,191 +800,139 @@ const RimuoviSfondo = () => {
     link.download = `no-background-${Date.now()}.png`;
     link.href = processedImage;
     link.click();
-
     toast({
       title: "Download avviato",
       description: "L'immagine senza sfondo è stata scaricata",
+      duration: 4000,
     });
   };
   const reset = () => {
     setImage(null);
     setPreview(null);
     setProcessedImage(null);
-    setBatchImages([]);
-    setProcessedBatchImages([]);
-    setProcessingMode("single");
+    setImages([]);
+    setProcessedImages([]);
   };
   return (
     <MainLayout>
+      {" "}
       <div className="tool-header">
-        <h1>Rimuovi sfondo</h1>
+        <h1>
+          Rimuovi Sfondo da Foto Online Gratis - AI Background Remover Batch
+        </h1>
         <p className="text-gray-600 mt-2">
-          Rimuovi automaticamente lo sfondo dalle tue immagini usando algoritmi
-          avanzati di computer vision. Include edge detection, flood fill,
-          analisi dei colori e anti-aliasing per risultati professionali.
-          Converti il risultato in PNG con trasparenza.
+          Rimuovi automaticamente lo sfondo dalle tue foto con intelligenza
+          artificiale avanzata.{" "}
+          <strong>Caricamento massivo fino a 50 immagini</strong> per
+          elaborazione batch professionale. Converti immagini in PNG con
+          trasparenza perfetta. Strumento gratuito per rimuovere sfondo da foto,
+          perfetto per e-commerce, social media e design professionale. Supporta
+          JPEG, PNG, WEBP con <strong>processing batch veloce</strong> per
+          grandi volumi di immagini.
         </p>
       </div>
       <canvas ref={canvasRef} style={{ display: "none" }}></canvas>{" "}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg border p-6">
-            <Tabs
-              value={processingMode}
-              onValueChange={(value: "single" | "batch") =>
-                setProcessingMode(value)
-              }
-              className="mb-6"
-            >
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="single">Singola immagine</TabsTrigger>
-                <TabsTrigger value="batch">Batch (fino a 50)</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="single" className="mt-6">
-                <div className="mb-6">
-                  <h2 className="text-xl font-medium mb-2">
-                    1. Carica un'immagine
-                  </h2>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                    {preview ? (
-                      <div className="flex flex-col items-center">
-                        <img
-                          src={preview}
-                          alt="Anteprima"
-                          className="max-w-full max-h-64 mb-4 object-contain border rounded"
-                        />
-                        <p className="text-sm text-gray-500 mb-2">
-                          Immagine caricata: {image?.name}
-                        </p>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm" onClick={reset}>
-                            <Trash className="h-4 w-4 mr-1" /> Rimuovi
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                              document
-                                .getElementById("single-image-upload")
-                                ?.click()
-                            }
-                          >
-                            Cambia immagine
-                          </Button>
+            {" "}
+            <div className="mb-6">
+              <h2 className="text-xl font-medium mb-2">
+                1. Carica immagini (fino a 50 per elaborazione batch)
+              </h2>
+              <div
+                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                  isDragActive
+                    ? "border-blue-400 bg-blue-50"
+                    : "border-gray-300 hover:border-gray-400"
+                }`}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+              >
+                {images.length > 0 ? (
+                  <div className="flex flex-col items-center">
+                    <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mb-4 max-w-full overflow-hidden">
+                      {images.slice(0, 12).map((file, index) => (
+                        <div key={index} className="relative">
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt={`Preview ${index + 1}`}
+                            className="w-16 h-16 object-cover border rounded"
+                          />
                         </div>
-                      </div>
-                    ) : (
-                      <div>
-                        <Upload className="mx-auto h-12 w-12 text-gray-400 mb-2" />
-                        <p className="text-gray-600 mb-2">
-                          Trascina qui la tua immagine o
-                        </p>
-                        <Button
-                          variant="outline"
-                          onClick={() =>
-                            document
-                              .getElementById("single-image-upload")
-                              ?.click()
-                          }
-                        >
-                          Seleziona immagine
-                        </Button>
-                        <input
-                          id="single-image-upload"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleFileChange}
-                        />
-                        <p className="mt-2 text-sm text-gray-500">
-                          JPG, PNG, WEBP o altri formati (max 10MB)
-                        </p>
-                      </div>
-                    )}
+                      ))}
+                      {images.length > 12 && (
+                        <div className="w-16 h-16 border rounded bg-gray-100 flex items-center justify-center text-xs">
+                          +{images.length - 12}
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-500 mb-2">
+                      {images.length} immagini caricate
+                    </p>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={reset}>
+                        <Trash className="h-4 w-4 mr-1" /> Rimuovi tutte
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          document.getElementById("images-upload")?.click()
+                        }
+                      >
+                        Aggiungi altre
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="batch" className="mt-6">
-                <div className="mb-6">
-                  <h2 className="text-xl font-medium mb-2">
-                    1. Carica fino a 50 immagini
-                  </h2>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                    {batchImages.length > 0 ? (
-                      <div className="flex flex-col items-center">
-                        <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mb-4 max-w-full overflow-hidden">
-                          {batchImages.slice(0, 12).map((file, index) => (
-                            <div key={index} className="relative">
-                              <img
-                                src={URL.createObjectURL(file)}
-                                alt={`Preview ${index + 1}`}
-                                className="w-16 h-16 object-cover border rounded"
-                              />
-                            </div>
-                          ))}
-                          {batchImages.length > 12 && (
-                            <div className="w-16 h-16 border rounded bg-gray-100 flex items-center justify-center text-xs">
-                              +{batchImages.length - 12}
-                            </div>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-500 mb-2">
-                          {batchImages.length} immagini caricate
-                        </p>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm" onClick={reset}>
-                            <Trash className="h-4 w-4 mr-1" /> Rimuovi tutte
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                              document
-                                .getElementById("batch-images-upload")
-                                ?.click()
-                            }
-                          >
-                            Aggiungi altre
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div>
-                        <Upload className="mx-auto h-12 w-12 text-gray-400 mb-2" />
-                        <p className="text-gray-600 mb-2">
-                          Trascina qui le tue immagini o
-                        </p>
-                        <Button
-                          variant="outline"
-                          onClick={() =>
-                            document
-                              .getElementById("batch-images-upload")
-                              ?.click()
-                          }
-                        >
-                          Seleziona immagini
-                        </Button>
-                        <input
-                          id="batch-images-upload"
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          className="hidden"
-                          onChange={handleBatchFileChange}
-                        />
-                        <p className="mt-2 text-sm text-gray-500">
-                          Seleziona fino a 50 immagini (JPG, PNG, WEBP - max
-                          10MB ciascuna)
-                        </p>
-                      </div>
+                ) : (
+                  <div>
+                    <Upload
+                      className={`mx-auto h-12 w-12 mb-2 ${
+                        isDragActive ? "text-blue-500" : "text-gray-400"
+                      }`}
+                    />
+                    <p
+                      className={`mb-2 ${
+                        isDragActive
+                          ? "text-blue-600 font-medium"
+                          : "text-gray-600"
+                      }`}
+                    >
+                      {isDragActive
+                        ? "Rilascia qui le tue immagini"
+                        : "Trascina qui le tue immagini o"}
+                    </p>
+                    {!isDragActive && (
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          document.getElementById("images-upload")?.click()
+                        }
+                      >
+                        Seleziona immagini
+                      </Button>
                     )}
+                    <input
+                      id="images-upload"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={handleFileChange}
+                    />
+                    <p className="mt-2 text-sm text-gray-500">
+                      Seleziona una o più immagini per{" "}
+                      <strong>elaborazione batch</strong> (JPG, PNG, WEBP - max
+                      10MB ciascuna, fino a 50 immagini simultanee)
+                    </p>
                   </div>
-                </div>
-              </TabsContent>
-            </Tabs>{" "}
-            {(preview || batchImages.length > 0) && (
+                )}
+              </div>
+            </div>{" "}
+            {(preview || images.length > 0) && (
               <div className="mb-6">
                 <h2 className="text-xl font-medium mb-4">
                   2. Rimuovi lo sfondo
@@ -927,121 +982,116 @@ const RimuoviSfondo = () => {
                   </p>
                 </div>
 
-                {processingMode === "single" ? (
+                <div className="space-y-4">
+                  {processing && (
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm mb-2">
+                        <span>Elaborazione in corso...</span>
+                        <span>
+                          {currentProcessing} di {images.length}
+                        </span>
+                      </div>
+                      <Progress
+                        value={(currentProcessing / images.length) * 100}
+                      />
+                    </div>
+                  )}
+
                   <Button
-                    onClick={removeBackground}
-                    disabled={loading}
+                    onClick={
+                      images.length === 1 ? removeBackground : processImages
+                    }
+                    disabled={processing || images.length === 0}
                     className="w-full py-6"
                   >
-                    {loading ? (
+                    {processing ? (
                       <>
                         <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                        Elaborazione avanzata in corso...
+                        Elaborazione in corso...
                       </>
                     ) : (
                       <>
                         <ImageIcon className="mr-2 h-5 w-5" />
-                        Rimuovi sfondo (AI-Enhanced)
+                        {images.length === 1
+                          ? "Rimuovi sfondo (AI-Enhanced)"
+                          : `Elabora ${images.length} immagini`}
                       </>
                     )}
                   </Button>
-                ) : (
-                  <div className="space-y-4">
-                    {batchLoading && (
-                      <div className="mb-4">
-                        <div className="flex justify-between text-sm mb-2">
-                          <span>Elaborazione in corso...</span>
-                          <span>
-                            {currentProcessing} di {batchImages.length}
-                          </span>
-                        </div>
-                        <Progress
-                          value={(currentProcessing / batchImages.length) * 100}
-                        />
+
+                  {processedImages.length > 0 && (
+                    <div className="mt-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-medium">
+                          Risultati ({processedImages.length})
+                        </h3>
+                        {processedImages.length > 1 && (
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={downloadAllProcessedImages}
+                              className="px-4"
+                            >
+                              <Archive className="h-4 w-4 mr-2" />
+                              ZIP ({processedImages.length})
+                            </Button>
+                            <Button
+                              onClick={downloadSingleImages}
+                              variant="outline"
+                              className="px-4"
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              Singole
+                            </Button>
+                          </div>
+                        )}
                       </div>
-                    )}
-
-                    <Button
-                      onClick={processBatchImages}
-                      disabled={batchLoading || batchImages.length === 0}
-                      className="w-full py-6"
-                    >
-                      {batchLoading ? (
-                        <>
-                          <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                          Elaborazione batch in corso...
-                        </>
-                      ) : (
-                        <>
-                          <ImageIcon className="mr-2 h-5 w-5" />
-                          Elabora {batchImages.length} immagini
-                        </>
-                      )}
-                    </Button>
-
-                    {processedBatchImages.length > 0 && (
-                      <div className="mt-6">
-                        <div className="flex justify-between items-center mb-4">
-                          <h3 className="text-lg font-medium">
-                            Risultati batch
-                          </h3>
-                          <Button
-                            onClick={downloadAllProcessedImages}
-                            className="px-6"
-                          >
-                            <Download className="h-4 w-4 mr-2" />
-                            Scarica tutte ({processedBatchImages.length})
-                          </Button>
-                        </div>
-
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
-                          {processedBatchImages.map((item, index) => (
-                            <div key={index} className="border rounded-lg p-2">
-                              <div className="mb-2">
-                                <div className="text-xs text-gray-500 mb-1">
-                                  Originale
-                                </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
+                        {processedImages.map((item, index) => (
+                          <div key={index} className="border rounded-lg p-2">
+                            <div className="mb-2">
+                              <div className="text-xs text-gray-500 mb-1">
+                                Originale
+                              </div>
+                              <img
+                                src={item.originalUrl}
+                                alt={`Original ${index + 1}`}
+                                className="w-full h-20 object-cover rounded"
+                              />
+                            </div>
+                            <div className="mb-2">
+                              <div className="text-xs text-gray-500 mb-1">
+                                Processata
+                              </div>
+                              <div className="bg-checkerboard rounded p-1">
                                 <img
-                                  src={item.originalUrl}
-                                  alt={`Original ${index + 1}`}
-                                  className="w-full h-20 object-cover rounded"
+                                  src={item.processed}
+                                  alt={`Processed ${index + 1}`}
+                                  className="w-full h-20 object-contain"
                                 />
                               </div>
-                              <div className="mb-2">
-                                <div className="text-xs text-gray-500 mb-1">
-                                  Processata
-                                </div>
-                                <div className="bg-checkerboard rounded p-1">
-                                  <img
-                                    src={item.processed}
-                                    alt={`Processed ${index + 1}`}
-                                    className="w-full h-20 object-contain"
-                                  />
-                                </div>
-                              </div>
-                              <Button
-                                onClick={() => {
-                                  const link = document.createElement("a");
-                                  const fileName =
-                                    item.file.name.replace(/\.[^/.]+$/, "") +
-                                    "_no_bg.png";
-                                  link.download = fileName;
-                                  link.href = item.processed;
-                                  link.click();
-                                }}
-                                size="sm"
-                                className="w-full text-xs"
-                              >
-                                <Download className="h-3 w-3 mr-1" />
-                                Scarica
-                              </Button>
                             </div>
-                          ))}
-                        </div>
+                            <Button
+                              onClick={() => {
+                                const link = document.createElement("a");
+                                const fileName =
+                                  item.file.name.replace(/\.[^/.]+$/, "") +
+                                  "_no_bg.png";
+                                link.download = fileName;
+                                link.href = item.processed;
+                                link.click();
+                              }}
+                              size="sm"
+                              className="w-full text-xs"
+                            >
+                              <Download className="h-3 w-3 mr-1" />
+                              Scarica
+                            </Button>
+                          </div>
+                        ))}
                       </div>
-                    )}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
             {processedImage && (
@@ -1084,80 +1134,49 @@ const RimuoviSfondo = () => {
         <div className="lg:col-span-1">
           {" "}
           <div className="bg-white rounded-lg border p-6 mb-6">
-            <h3 className="font-medium mb-4">Come funziona</h3>
+            <h3 className="font-medium mb-4">
+              Come funziona - Batch Processing
+            </h3>
             <ol className="space-y-3 text-sm text-gray-700">
               <li className="flex gap-2">
                 <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium">
                   1
                 </div>
-                <span>Carica una o più immagini (fino a 50 per il batch)</span>
+                <span>
+                  Carica <strong>fino a 50 immagini</strong> con drag & drop o
+                  selezione multipla
+                </span>
               </li>
               <li className="flex gap-2">
                 <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium">
                   2
                 </div>
-                <span>Regola la sensibilità dell'algoritmo</span>
+                <span>
+                  Regola la sensibilità per l'
+                  <strong>elaborazione batch</strong> ottimale
+                </span>
               </li>
               <li className="flex gap-2">
                 <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium">
                   3
                 </div>
                 <span>
-                  Elabora e scarica i risultati in PNG con trasparenza
+                  Elabora tutte le immagini e scarica come{" "}
+                  <strong>ZIP singolo</strong> o file separati
                 </span>
               </li>
             </ol>
           </div>{" "}
           <div className="bg-white rounded-lg border p-6 mb-6">
-            <h3 className="font-medium mb-4">Algoritmi utilizzati</h3>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li className="flex gap-2 items-start">
-                <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium mt-0.5">
-                  •
-                </div>
-                <span>
-                  <strong>Edge Detection:</strong> Algoritmo Sobel per
-                  identificare i bordi del soggetto
-                </span>
-              </li>
-              <li className="flex gap-2 items-start">
-                <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium mt-0.5">
-                  •
-                </div>
-                <span>
-                  <strong>Flood Fill:</strong> Riempimento delle regioni di
-                  sfondo connesse
-                </span>
-              </li>
-              <li className="flex gap-2 items-start">
-                <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium mt-0.5">
-                  •
-                </div>
-                <span>
-                  <strong>Analisi colori:</strong> Identificazione automatica
-                  del colore di sfondo dominante
-                </span>
-              </li>
-              <li className="flex gap-2 items-start">
-                <div className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium mt-0.5">
-                  •
-                </div>
-                <span>
-                  <strong>Anti-aliasing:</strong> Bordi smussati per un
-                  risultato più naturale
-                </span>
-              </li>
-            </ul>
-          </div>
-          <div className="bg-white rounded-lg border p-6 mb-6">
-            <h3 className="font-medium mb-4">Suggerimenti</h3>
+            <h3 className="font-medium mb-4">Vantaggi Batch Processing</h3>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex gap-2 items-start">
                 <div className="bg-green-100 text-green-700 rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center font-medium mt-0.5">
                   •
                 </div>
                 <span>
-                  Usa una sensibilità bassa (10-30) per sfondi molto uniformi
+                  <strong>Elaborazione massiva:</strong> Fino a 50 immagini in
+                  una sola volta
                 </span>
               </li>
               <li className="flex gap-2 items-start">
@@ -1165,8 +1184,8 @@ const RimuoviSfondo = () => {
                   •
                 </div>
                 <span>
-                  Usa una sensibilità alta (60-100) per sfondi con variazioni di
-                  colore
+                  <strong>Download ZIP:</strong> Scarica tutte le immagini
+                  processate in un archivio
                 </span>
               </li>
               <li className="flex gap-2 items-start">
@@ -1174,8 +1193,8 @@ const RimuoviSfondo = () => {
                   •
                 </div>
                 <span>
-                  Migliori risultati con soggetti ben contrastati rispetto allo
-                  sfondo
+                  <strong>Ideale per e-commerce:</strong> Processa cataloghi
+                  prodotti velocemente
                 </span>
               </li>
               <li className="flex gap-2 items-start">
@@ -1183,7 +1202,8 @@ const RimuoviSfondo = () => {
                   •
                 </div>
                 <span>
-                  L'output include anti-aliasing per bordi più naturali
+                  <strong>Risparmio tempo:</strong> Automatizza la rimozione
+                  sfondo su grandi volumi
                 </span>
               </li>
               <li className="flex gap-2 items-start">
