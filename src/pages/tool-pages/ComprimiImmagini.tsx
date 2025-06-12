@@ -286,7 +286,6 @@ const ComprimiImmagini = () => {
             compressionQuality = Math.min(1.0, compressionQuality + 0.1);
           } else if (outputFormat === "image/jpeg") {
             // JPEG usa la qualità impostata dall'utente
-            compressionQuality = compressionQuality;
           }
 
           // Applica compressione aggressiva se richiesta
